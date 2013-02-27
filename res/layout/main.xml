@@ -18,12 +18,21 @@
         android:textSize="60sp" />
 
     <Button
-        android:id="@+id/btnSetToZero"
+        android:id="@+id/btnResetZero"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@+id/btnSetZero"
+        android:layout_marginBottom="10dp"
+        android:text="@string/reset_zero" />
+    
+    <Button
+        android:id="@+id/btnSetZero"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="36dp"
-        android:text="@string/set_to_zero" />
+        android:text="@string/set_zero" />
 
 </RelativeLayout>

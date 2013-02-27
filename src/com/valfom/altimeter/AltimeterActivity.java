@@ -6,7 +6,6 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -19,7 +18,8 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 	private Sensor sensorPressure;
 	
 	private TextView tvAltitude;
-	private Button btnSetToZero;
+	private Button btnSetZero;
+	private Button btnResetZero;
 	
 	private float altitude;
 	private float zeroAltitude;
@@ -32,9 +32,11 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
         setContentView(R.layout.main);
         
         tvAltitude = (TextView) findViewById(R.id.tvAltitude);
-        btnSetToZero = (Button) findViewById(R.id.btnSetToZero);
+        btnSetZero = (Button) findViewById(R.id.btnSetZero);
+        btnResetZero = (Button) findViewById(R.id.btnResetZero);
         
-        btnSetToZero.setOnClickListener(this);
+        btnSetZero.setOnClickListener(this);
+        btnResetZero.setOnClickListener(this);
         
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
 		sensorPressure = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
@@ -83,9 +85,9 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 		
 		customAltitude /= 1000;
 		
-		if ((customAltitude < 0) && (customAltitude < 0.01)) customAltitude = Math.abs(customAltitude);
+		if ((customAltitude < 0) && (customAltitude < 0.001)) customAltitude = Math.abs(customAltitude);
 		
-		tvAltitude.setText(String.format("%.2f", customAltitude));
+		tvAltitude.setText(String.format("%.3f", customAltitude));
 	}
 
 	@Override
@@ -93,8 +95,11 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 		
 		switch (v.getId()) {
 		
-		case R.id.btnSetToZero:
+		case R.id.btnSetZero:
 			zeroAltitude = altitude;
+			break;
+		case R.id.btnResetZero:
+			zeroAltitude = 0;
 			break;
 		}
 	}
