@@ -19,8 +19,9 @@
 
         <RingtonePreference
             android:key="rSound"
-            android:ringtoneType="notification"
+            android:ringtoneType="all"
             android:showSilent="true"
+            android:showDefault="false"
             android:title="@string/settings_sound" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/settings_altitude" >

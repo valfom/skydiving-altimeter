@@ -2,16 +2,20 @@ package com.valfom.skydiving.altimeter;
 
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.preference.RingtonePreference;
 
 public class AltimeterPreferenceActivity extends PreferenceActivity implements OnSharedPreferenceChangeListener {
 
 	public static final String KEY_MEASUREMENT_UNITS = "lUnits";
-//	public static final String KEY_SOUND = "rSound";
+	public static final String KEY_SOUND = "rSound";
 //	public static final String KEY_VIBRATION = "cbVibration";
 	public static final String KEY_FIRST_ALTITUDE = "etFirstAltitude";
 	public static final String KEY_SECOND_ALTITUDE = "etSecondAltitude";
@@ -21,6 +25,7 @@ public class AltimeterPreferenceActivity extends PreferenceActivity implements O
 	private EditTextPreference etFirstAltitude;
 	private EditTextPreference etSecondAltitude;
 	private EditTextPreference etThirdAltitude;
+	private RingtonePreference rSound;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +38,7 @@ public class AltimeterPreferenceActivity extends PreferenceActivity implements O
 		etFirstAltitude = (EditTextPreference) getPreferenceScreen().findPreference(KEY_FIRST_ALTITUDE);
 		etSecondAltitude = (EditTextPreference) getPreferenceScreen().findPreference(KEY_SECOND_ALTITUDE);
 		etThirdAltitude = (EditTextPreference) getPreferenceScreen().findPreference(KEY_THIRD_ALTITUDE);
+		rSound = (RingtonePreference) getPreferenceScreen().findPreference(KEY_SOUND);
 	}
 	
 	@Override
@@ -54,12 +60,21 @@ public class AltimeterPreferenceActivity extends PreferenceActivity implements O
 		
 		SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
 
+		Uri ringtoneUri = Uri.parse(sharedPreferences.getString(KEY_SOUND, "Silent"));
+		Ringtone ringtone = RingtoneManager.getRingtone(this, ringtoneUri);
+		
+		String summary = "Silent";
+		
+		if (ringtone != null) summary = ringtone.getTitle(this);
+		
+		rSound.setSummary(summary);
+		
         lMeasurementUnits.setSummary(sharedPreferences.getString(KEY_MEASUREMENT_UNITS, 
         		getString(R.string.settings_measurement_units)));
         
         String altitude = sharedPreferences.getString(KEY_FIRST_ALTITUDE, getString(R.string.first_altitude));
 		
-		String summary = altitude + " " + settings.getAltitudeUnit();
+		summary = altitude + " " + settings.getAltitudeUnit();
         
         etFirstAltitude.setSummary(summary);
         etFirstAltitude.setPositiveButtonText(getString(R.string.save));
