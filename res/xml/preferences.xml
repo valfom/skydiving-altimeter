@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="@string/settings_personal" >
+        <ListPreference
+            android:defaultValue="@string/settings_units_metric"
+            android:dialogTitle="@string/settings_measurement_units"
+            android:entries="@array/measurement_units_options"
+            android:entryValues="@array/measurement_units_values"
+            android:key="lUnits"
+            android:summary="@string/settings_units_metric"
+            android:title="@string/settings_measurement_units" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_notifications" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="cbVibration"
+            android:title="@string/settings_vibration" />
+
+        <RingtonePreference
+            android:key="rSound"
+            android:ringtoneType="notification"
+            android:showSilent="true"
+            android:title="@string/settings_sound" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_altitude" >
+        <EditTextPreference
+            android:defaultValue="@string/first_altitude"
+            android:inputType="number"
+            android:key="etFirstAltitude"
+            android:summary="@string/first_altitude"
+            android:title="@string/settings_first_altitude" />
+        <EditTextPreference
+            android:defaultValue="@string/second_altitude"
+            android:inputType="number"
+            android:key="etSecondAltitude"
+            android:summary="@string/second_altitude"
+            android:title="@string/settings_second_altitude" />
+        <EditTextPreference
+            android:defaultValue="@string/third_altitude"
+            android:inputType="number"
+            android:key="etThirdAltitude"
+            android:summary="@string/third_altitude"
+            android:title="@string/settings_third_altitude" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

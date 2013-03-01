@@ -35,4 +35,12 @@
         android:layout_marginBottom="36dp"
         android:text="@string/set_zero" />
 
+    <TextView
+        android:id="@+id/tvAltitudeUnit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/tvAltitude"
+        android:layout_below="@+id/tvAltitude"
+        android:text="@string/m" />
+
 </RelativeLayout>
