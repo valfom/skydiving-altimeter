@@ -1,7 +1,15 @@
 package com.valfom.skydiving.altimeter;
 
+import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
+
+import org.json.JSONArray;
+
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -12,12 +20,17 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.webkit.WebView;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 public class AltimeterActivity extends Activity implements SensorEventListener, OnClickListener {
 	
 	private static final String TAG = "AltimeterActivity";
+	private static final String PREF_FILE_NAME = "SAPrefs";
+	private static final byte STEP = 10;
 	
 	private SensorManager sensorManager;
 	private Sensor sensorPressure;
@@ -29,13 +42,23 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 	private TextView tvAltitude;
 	private TextView tvAltitudeUnit;
 	private Button btnSetZero;
-	private Button btnResetZero;
+	private Button btnLeft;
+	private Button btnRight;
+	private Button btnClear;
 	
 	private int altitude;
 	private int zeroAltitude;
+	private int maxAltitude;
 	
-	private boolean convert = false; 
+	private ArrayList<Integer> lAltitude = new ArrayList<Integer>();
+	
+//	private boolean convert = false;
+	private boolean showData = false;
+	
+	private Timer timer;
+	private WebView wvGraphs;
 
+    @SuppressLint("SetJavaScriptEnabled") 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
     	
@@ -55,10 +78,44 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 	        tvAltitude = (TextView) findViewById(R.id.tvAltitude);
 	        tvAltitudeUnit = (TextView) findViewById(R.id.tvAltitudeUnit);
 	        btnSetZero = (Button) findViewById(R.id.btnSetZero);
-	        btnResetZero = (Button) findViewById(R.id.btnResetZero);
+	        btnLeft = (Button) findViewById(R.id.btnLeft);
+	        btnRight = (Button) findViewById(R.id.btnRight);
+	        btnClear = (Button) findViewById(R.id.btnClear);
 	        
 	        btnSetZero.setOnClickListener(this);
-	        btnResetZero.setOnClickListener(this);
+	        btnLeft.setOnClickListener(this);
+	        btnRight.setOnClickListener(this);
+	        btnClear.setOnClickListener(this);
+	        
+	        ToggleButton tbShowData = (ToggleButton) findViewById(R.id.tbShowData);
+			
+	        tbShowData.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+				
+			    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+			    	
+			        if (isChecked) {
+			            
+			        	showData = true;
+			        	
+			        	timer = new Timer();
+			        	timer.schedule(new setGraphsDataTask(), 500, 2000);
+			        	
+			        } else {
+			        	
+			        	showData = false;
+			        	
+			        	timer.cancel();
+			        	timer = null;
+			        }
+			    }
+			});
+	        
+	        wvGraphs = (WebView) findViewById(R.id.wvGraphs);
+
+	        wvGraphs.setVerticalScrollBarEnabled(false);
+	        wvGraphs.setHorizontalScrollBarEnabled(false);
+	        wvGraphs.getSettings().setJavaScriptEnabled(true);
+	        wvGraphs.loadUrl("file:///android_asset/graphs/graphs.html");
         
 //			vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 		
@@ -68,15 +125,17 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 //	    	wakeLock.acquire();
 //        	vibrator.vibrate(1000);
 //        	wakeLock.release();
+	        
+	        sensorManager.registerListener(this, sensorPressure, SensorManager.SENSOR_DELAY_FASTEST);
 		}
     }
     
     @Override
-	protected void onPause() {
-	
-		super.onPause();
-		
-		sensorManager.unregisterListener(this);
+	protected void onDestroy() {
+
+    	super.onDestroy();
+    	
+    	sensorManager.unregisterListener(this);
 	}
 
 	@Override
@@ -84,15 +143,17 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 
 		super.onResume();
 		
+		SharedPreferences sharedPreferences = getSharedPreferences(PREF_FILE_NAME, Activity.MODE_PRIVATE);
+		zeroAltitude = sharedPreferences.getInt("zeroAltitude", 0);
+		
 		settings = new AltimeterSettings(this);
 		
 		String altitudeUnit = settings.getAltitudeUnit();
-		if (altitudeUnit.equals(getString(R.string.ft))) convert = true;
-		else convert = false;
+		
+//		if (altitudeUnit.equals(getString(R.string.ft))) convert = true;
+//		else convert = false;
 		
 		tvAltitudeUnit.setText(altitudeUnit);
-		
-		sensorManager.registerListener(this, sensorPressure, SensorManager.SENSOR_DELAY_FASTEST);
 	}
 	
     @Override
@@ -129,10 +190,44 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 		
 		customAltitude = altitude - zeroAltitude;
 		
-		if (convert) customAltitude = settings.convertAltitudeToFt(customAltitude);
+		if (customAltitude > maxAltitude) maxAltitude = customAltitude;
 		
 		tvAltitude.setText(String.valueOf(customAltitude));
+		
+		if (showData) lAltitude.add(customAltitude);
 	}
+	
+	class setGraphsDataTask extends TimerTask {
+
+        @Override
+        public void run() {
+        	
+            runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                   
+                	final JSONArray altitudeData = new JSONArray();
+                	float customMaxAltitude;
+
+        			for (int i = 0; i < lAltitude.size(); i++) {
+        				
+        				JSONArray altitudeEntry = new JSONArray();
+
+        				altitudeEntry.put(i);
+        				
+        				altitudeEntry.put(lAltitude.get(i));
+        				
+        				altitudeData.put(altitudeEntry);
+        			}
+        			
+        			customMaxAltitude = 1000 * (maxAltitude / 1000 + 1); // km
+
+        	        wvGraphs.loadUrl("javascript:setGraphsData(" + altitudeData.toString() + ", " + customMaxAltitude + ")");
+                }
+            });
+        }
+   };
 
 	@Override
 	public void onClick(View v) {
@@ -142,10 +237,22 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 		case R.id.btnSetZero:
 			zeroAltitude = altitude;
 			break;
-		case R.id.btnResetZero:
-			zeroAltitude = 0;
+			
+		case R.id.btnLeft:
+			zeroAltitude += STEP;
+			break;
+			
+		case R.id.btnRight:
+			zeroAltitude -= STEP;
+			break;
+		case R.id.btnClear:
+			lAltitude.clear();
 			break;
 		}
+		
+		SharedPreferences sharedPreferences = getSharedPreferences(PREF_FILE_NAME, Activity.MODE_PRIVATE);
+		SharedPreferences.Editor editor = sharedPreferences.edit();
+		editor.putInt("zeroAltitude", zeroAltitude);
+		editor.apply();
 	}
-    
 }
