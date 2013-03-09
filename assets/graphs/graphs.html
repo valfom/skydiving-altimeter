@@ -5,6 +5,8 @@
     	<title>Graphs</title>
     	<script language="javascript" type="text/javascript" src="./jquery.js"></script>
     	<script language="javascript" type="text/javascript" src="./jquery.flot.js"></script>
+    	<script language="javascript" type="text/javascript" src="./jquery.flot.time.js"></script>
+    	<script language="javascript" type="text/javascript" src="./jquery.flot.navigate.js"></script>
     	<style type="text/css">
     
         	html, body {
@@ -14,7 +16,8 @@
     	</style>
     	<script type="text/javascript">
 
-		var data = [];
+		var aData;
+		var vsData;
 		var max = 1;
 	
 		$(function () {
@@ -24,26 +27,25 @@
 		
 		function drawGraphs() {
 		
-			$.plot("#placeholder",  [data] , {
-				series: {
-					label: "Altitude",
-					shadowSize: 0
-				},
-				legend: { position: "ne", show: true },
-				yaxis: {
-					min: 0,
-					max: max
-				},
-				xaxis: {
-					min: 0
-				}
+			var data = [];
+		
+			data = [ { data: aData, label: "Altitude", lines: { show: true, lineWidth: 2 }, shadowSize: 0 },
+					{ data: vsData, label: "Vertical speed", yaxis: 2, lines: { show: true, lineWidth: 2 }, shadowSize: 0 } ];
+		
+			$.plot("#placeholder",  data, 
+			{
+				legend: { position: "nw"},
+				xaxis:
+				{	min: 0},
+				yaxes: { min: 0 }
 			});
 		}
 		
-		function setGraphsData(altitudeData, maxAltitude) {
+		function setGraphsData(altitudeData, maxAltitude, verticalSpeedData) {
 		
-			data = altitudeData;
+			aData = altitudeData;
 			max = maxAltitude;
+			vsData = verticalSpeedData;
 	
 			drawGraphs();
 		}

@@ -32,5 +32,7 @@
     <string name="second_altitude">1300</string>
     <string name="third_altitude">800</string>
     <string name="btn_clear">Clear</string>
+    <string name="btn_left">&lt;</string>
+    <string name="btn_right">&gt;</string>
 
 </resources>

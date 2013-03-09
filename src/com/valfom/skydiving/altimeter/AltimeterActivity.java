@@ -31,6 +31,7 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 	private static final String TAG = "AltimeterActivity";
 	private static final String PREF_FILE_NAME = "SAPrefs";
 	private static final byte STEP = 10;
+	private static final int GRAPHS_UPDATE_TIME = 1000; // ms
 	
 	private SensorManager sensorManager;
 	private Sensor sensorPressure;
@@ -55,9 +56,14 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 //	private boolean convert = false;
 	private boolean showData = false;
 	
-	private Timer timer;
+	private Timer timerGraphs;
 	private WebView wvGraphs;
-
+	
+	// Vertical speed
+	private Integer firstAltitude = null;
+	private Integer secondAltitude = null;
+	private ArrayList<Long> lVerticalSpeed = new ArrayList<Long>();
+	
     @SuppressLint("SetJavaScriptEnabled") 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -97,15 +103,15 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 			            
 			        	showData = true;
 			        	
-			        	timer = new Timer();
-			        	timer.schedule(new setGraphsDataTask(), 500, 2000);
+			        	timerGraphs = new Timer();
+			        	timerGraphs.schedule(new setGraphsDataTask(), 0, GRAPHS_UPDATE_TIME);
 			        	
 			        } else {
 			        	
 			        	showData = false;
 			        	
-			        	timer.cancel();
-			        	timer = null;
+			        	timerGraphs.cancel();
+			        	timerGraphs = null;
 			        }
 			    }
 			});
@@ -194,10 +200,10 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 		
 		tvAltitude.setText(String.valueOf(customAltitude));
 		
-		if (showData) lAltitude.add(customAltitude);
+//		if (showData) lAltitude.add(customAltitude);
 	}
 	
-	class setGraphsDataTask extends TimerTask {
+	private class setGraphsDataTask extends TimerTask {
 
         @Override
         public void run() {
@@ -206,7 +212,43 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 
                 @Override
                 public void run() {
+                	
+                	int customAltitude, diffAltitude;
+                	long verticalSpeed;
+                	
+                	if (showData) {
+                		
+                		customAltitude = altitude - zeroAltitude;
+                		lAltitude.add(customAltitude);
+                		
+                		if (firstAltitude != null) {
+                			
+                			secondAltitude = customAltitude;
+                			
+                			diffAltitude = Math.abs(secondAltitude - firstAltitude);
+                			
+                			verticalSpeed = diffAltitude / (GRAPHS_UPDATE_TIME / 1000);
+                			
+                			lVerticalSpeed.add(verticalSpeed);
+                			
+                			firstAltitude = secondAltitude;
+                			
+                		} else firstAltitude = customAltitude; 
+                	}
                    
+                	final JSONArray verticalSpeedData = new JSONArray();
+
+        			for (int i = 0; i < lVerticalSpeed.size(); i++) {
+        				
+        				JSONArray verticalSpeedEntry = new JSONArray();
+
+        				verticalSpeedEntry.put(i);
+        				
+        				verticalSpeedEntry.put(lVerticalSpeed.get(i));
+        				
+        				verticalSpeedData.put(verticalSpeedEntry);
+        			}
+                	
                 	final JSONArray altitudeData = new JSONArray();
                 	float customMaxAltitude;
 
@@ -223,7 +265,7 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
         			
         			customMaxAltitude = 1000 * (maxAltitude / 1000 + 1); // km
 
-        	        wvGraphs.loadUrl("javascript:setGraphsData(" + altitudeData.toString() + ", " + customMaxAltitude + ")");
+        	        wvGraphs.loadUrl("javascript:setGraphsData(" + altitudeData.toString() + ", " + customMaxAltitude + ", " + verticalSpeedData.toString() + ")");
                 }
             });
         }
@@ -245,6 +287,7 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 		case R.id.btnRight:
 			zeroAltitude -= STEP;
 			break;
+			
 		case R.id.btnClear:
 			lAltitude.clear();
 			break;
