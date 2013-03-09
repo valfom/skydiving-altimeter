@@ -271,7 +271,8 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
         }
    };
 
-	@Override
+	
+   @Override
 	public void onClick(View v) {
 		
 		switch (v.getId()) {
@@ -290,6 +291,7 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 			
 		case R.id.btnClear:
 			lAltitude.clear();
+			lVerticalSpeed.clear();
 			break;
 		}
 		

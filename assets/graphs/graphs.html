@@ -29,15 +29,15 @@
 		
 			var data = [];
 		
-			data = [ { data: aData, label: "Altitude", lines: { show: true, lineWidth: 2 }, shadowSize: 0 },
-					{ data: vsData, label: "Vertical speed", yaxis: 2, lines: { show: true, lineWidth: 2 }, shadowSize: 0 } ];
+			data = [ { data: aData, label: "Altitude", lines: { show: true, lineWidth: 1 }, shadowSize: 0 },
+					{ data: vsData, label: "Vertical speed", yaxis: 2, lines: { show: true, lineWidth: 1 }, shadowSize: 0 } ];
 		
 			$.plot("#placeholder",  data, 
 			{
 				legend: { position: "nw"},
-				xaxis:
-				{	min: 0},
-				yaxes: { min: 0 }
+				xaxis: { min: 0 },
+				yaxes: { min: 0 },
+				colors: ["#FF0000", "#0099FF"]
 			});
 		}
 		
