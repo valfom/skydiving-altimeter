@@ -37,7 +37,6 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 	private Sensor sensorPressure;
 //	private Vibrator vibrator;
 //	private PowerManager.WakeLock wakeLock;
-	
 	public AltimeterSettings settings;
 	
 	private TextView tvAltitude;
@@ -47,22 +46,20 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 	private Button btnRight;
 	private Button btnClear;
 	
-	private int altitude;
-	private int zeroAltitude;
-	private int maxAltitude;
-	
-	private ArrayList<Integer> lAltitude = new ArrayList<Integer>();
-	
 //	private boolean convert = false;
-	private boolean showData = false;
 	
 	private Timer timerGraphs;
 	private WebView wvGraphs;
 	
+	// Altitude
+	private int altitude;
+	private int zeroAltitude;
+	private ArrayList<Integer> lAltitude = new ArrayList<Integer>();
+	
 	// Vertical speed
 	private Integer firstAltitude = null;
 	private Integer secondAltitude = null;
-	private ArrayList<Long> lVerticalSpeed = new ArrayList<Long>();
+	private ArrayList<Integer> lVerticalSpeed = new ArrayList<Integer>();
 	
     @SuppressLint("SetJavaScriptEnabled") 
     @Override
@@ -79,6 +76,7 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
         
 			Log.d(TAG, "Barometer: min delay " + sensorPressure.getMinDelay() 
 					+ ", power " + sensorPressure.getPower() 
+					+ ", resolution" + sensorPressure.getResolution()
 					+ ", max range " + sensorPressure.getMaximumRange());
 			
 	        tvAltitude = (TextView) findViewById(R.id.tvAltitude);
@@ -101,17 +99,16 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 			    	
 			        if (isChecked) {
 			            
-			        	showData = true;
-			        	
 			        	timerGraphs = new Timer();
 			        	timerGraphs.schedule(new setGraphsDataTask(), 0, GRAPHS_UPDATE_TIME);
 			        	
 			        } else {
 			        	
-			        	showData = false;
+			        	if (timerGraphs != null) {
 			        	
-			        	timerGraphs.cancel();
-			        	timerGraphs = null;
+			        		timerGraphs.cancel();
+			        		timerGraphs = null;
+			        	}
 			        }
 			    }
 			});
@@ -132,6 +129,12 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 //        	vibrator.vibrate(1000);
 //        	wakeLock.release();
 	        
+	        // SENSOR_DELAY_NORMAL (200,000 microsecond delay) 200
+	        // SENSOR_DELAY_GAME (20,000 microsecond delay) 200
+	        // SENSOR_DELAY_UI (60,000 microsecond delay) <100 ms
+	        // SENSOR_DELAY_FASTEST (0 microsecond delay) 200 ms
+	        // As of Android 3.0 (API Level 11) you can also specify the delay as an absolute value (in microseconds).
+	        
 	        sensorManager.registerListener(this, sensorPressure, SensorManager.SENSOR_DELAY_FASTEST);
 		}
     }
@@ -149,12 +152,15 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 
 		super.onResume();
 		
-		SharedPreferences sharedPreferences = getSharedPreferences(PREF_FILE_NAME, Activity.MODE_PRIVATE);
+		String altitudeUnit;
+		SharedPreferences sharedPreferences;
+		
+		sharedPreferences = getSharedPreferences(PREF_FILE_NAME, Activity.MODE_PRIVATE);
 		zeroAltitude = sharedPreferences.getInt("zeroAltitude", 0);
 		
 		settings = new AltimeterSettings(this);
 		
-		String altitudeUnit = settings.getAltitudeUnit();
+		altitudeUnit = settings.getAltitudeUnit();
 		
 //		if (altitudeUnit.equals(getString(R.string.ft))) convert = true;
 //		else convert = false;
@@ -180,27 +186,24 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 	}
 
 	@Override
-	public void onAccuracyChanged(Sensor sensor, int accuracy) {}
+	public void onAccuracyChanged(Sensor sensor, int accuracy) {
+		
+		Log.d(TAG, "Accuracy " + accuracy);
+	}
 
 	@Override
 	public void onSensorChanged(SensorEvent event) {
 
-		float atmosphericPressure, pressureAtSeaLevel;
+		float atmosphericPressure;
 		int customAltitude;
 		
 		atmosphericPressure = event.values[0];
 		
-		pressureAtSeaLevel = SensorManager.PRESSURE_STANDARD_ATMOSPHERE;
-		
-		altitude = (int) SensorManager.getAltitude(pressureAtSeaLevel, atmosphericPressure);
+		altitude = (int) SensorManager.getAltitude(SensorManager.PRESSURE_STANDARD_ATMOSPHERE, atmosphericPressure);
 		
 		customAltitude = altitude - zeroAltitude;
 		
-		if (customAltitude > maxAltitude) maxAltitude = customAltitude;
-		
 		tvAltitude.setText(String.valueOf(customAltitude));
-		
-//		if (showData) lAltitude.add(customAltitude);
 	}
 	
 	private class setGraphsDataTask extends TimerTask {
@@ -214,63 +217,61 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
                 public void run() {
                 	
                 	int customAltitude, diffAltitude;
-                	long verticalSpeed;
+                	int verticalSpeed;
                 	
-                	if (showData) {
-                		
-                		customAltitude = altitude - zeroAltitude;
-                		lAltitude.add(customAltitude);
-                		
-                		if (firstAltitude != null) {
-                			
-                			secondAltitude = customAltitude;
-                			
-                			diffAltitude = Math.abs(secondAltitude - firstAltitude);
-                			
-                			verticalSpeed = diffAltitude / (GRAPHS_UPDATE_TIME / 1000);
-                			
-                			lVerticalSpeed.add(verticalSpeed);
-                			
-                			firstAltitude = secondAltitude;
-                			
-                		} else firstAltitude = customAltitude; 
-                	}
-                   
-                	final JSONArray verticalSpeedData = new JSONArray();
-
-        			for (int i = 0; i < lVerticalSpeed.size(); i++) {
-        				
-        				JSONArray verticalSpeedEntry = new JSONArray();
-
-        				verticalSpeedEntry.put(i);
-        				
-        				verticalSpeedEntry.put(lVerticalSpeed.get(i));
-        				
-        				verticalSpeedData.put(verticalSpeedEntry);
-        			}
+            		customAltitude = altitude - zeroAltitude;
+            		
+            		lAltitude.add(customAltitude);
+            		
+            		if (firstAltitude != null) {
+            			
+            			secondAltitude = customAltitude;
+            			
+            			diffAltitude = Math.abs(secondAltitude - firstAltitude);
+            			
+            			verticalSpeed = diffAltitude / (GRAPHS_UPDATE_TIME / 1000);
+            			
+            			lVerticalSpeed.add(verticalSpeed);
+            			
+            			firstAltitude = secondAltitude;
+            			
+            		} else firstAltitude = customAltitude; 
                 	
-                	final JSONArray altitudeData = new JSONArray();
-                	float customMaxAltitude;
-
-        			for (int i = 0; i < lAltitude.size(); i++) {
-        				
-        				JSONArray altitudeEntry = new JSONArray();
-
-        				altitudeEntry.put(i);
-        				
-        				altitudeEntry.put(lAltitude.get(i));
-        				
-        				altitudeData.put(altitudeEntry);
-        			}
-        			
-        			customMaxAltitude = 1000 * (maxAltitude / 1000 + 1); // km
-
-        	        wvGraphs.loadUrl("javascript:setGraphsData(" + altitudeData.toString() + ", " + customMaxAltitude + ", " + verticalSpeedData.toString() + ")");
+        	        setGraphsData();
                 }
             });
         }
    };
 
+   private void setGraphsData() {
+	   
+	   final JSONArray verticalSpeedData = new JSONArray();
+	   final JSONArray altitudeData = new JSONArray();
+
+		for (int i = 0; i < lVerticalSpeed.size(); i++) {
+			
+			JSONArray verticalSpeedEntry = new JSONArray();
+
+			verticalSpeedEntry.put(i);
+			
+			verticalSpeedEntry.put(lVerticalSpeed.get(i));
+			
+			verticalSpeedData.put(verticalSpeedEntry);
+		}
+   	
+		for (int i = 0; i < lAltitude.size(); i++) {
+			
+			JSONArray altitudeEntry = new JSONArray();
+
+			altitudeEntry.put(i);
+			
+			altitudeEntry.put(lAltitude.get(i));
+			
+			altitudeData.put(altitudeEntry);
+		}
+		
+       wvGraphs.loadUrl("javascript:setGraphsData(" + altitudeData.toString() + ", " + verticalSpeedData.toString() + ")");
+   }
 	
    @Override
 	public void onClick(View v) {
@@ -292,6 +293,7 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 		case R.id.btnClear:
 			lAltitude.clear();
 			lVerticalSpeed.clear();
+			setGraphsData();
 			break;
 		}
 		
