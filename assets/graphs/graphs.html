@@ -18,10 +18,32 @@
 
 		var aData = [];
 		var vsData = [];
+		var plot;
 	
 		$(function () {
 	
 			drawGraphs();
+			
+			$("<div class='button' style='right:20px;top:20px'>zoom out</div>")
+			.appendTo($("#choise"))
+			.click(function (event) {
+				event.preventDefault();
+				plot.zoomOut();
+			});
+			
+			function addArrow(dir, offset) {
+			$("<button class='button'>" + dir + "</button>")
+				.appendTo($("#choise"))
+				.click(function (e) {
+					e.preventDefault();
+					plot.pan(offset);
+				});
+		}
+
+		addArrow("left", { left: -10 });
+		addArrow("right", { left: 10 });
+		addArrow("up", { top: -10 });
+		addArrow("down", { top: 10 });
 		});
 		
 		// Remove the second item from the array
@@ -53,14 +75,18 @@
 				data.remove(1);
 			}
 		
-			$.plot("#placeholder",  data, 
+			plot = $.plot("#placeholder",  data, 
 			{
 				legend: { position: "nw" },
-				xaxes: [ { min: 0, tickDecimals: 0 } ],
-				yaxes: [ { min: 0, tickDecimals: 0 }, {min: 0, tickDecimals: 0, position: "right" } ],
-				colors: [ "#FF0000", "#0099FF" ] 
+				xaxes: [ { min: 0, tickDecimals: 0, zoomRange: [1, 10], panRange: [0, null] } ],
+				yaxes: [ { min: 0, tickDecimals: 0, zoomRange: [1, 10], panRange: [0, null] }, 
+						{ min: 0, tickDecimals: 0, position: "right", zoomRange: [1, 10], panRange: [0, null] } ],
+				colors: [ "#FF0000", "#0099FF" ], 
+				zoom: { interactive: false },
+				pan: { interactive: false }
 			});
 		}
+
 		
 		function setGraphsData(altitudeData, verticalSpeedData) {
 		
@@ -77,6 +103,7 @@
     		<input type="checkbox" name="verticalSpeed" checked="true" id="cbVerticalSpeed"></input>
     		<label for="cbVerticalSpeed">Vertical Speed</label>
     	</p>
+    	
     	<div id="placeholder" style="width:100%;height:80%;"></div>
 	</body>
 </html>
