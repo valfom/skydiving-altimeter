@@ -8,17 +8,14 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".AltimeterActivity" >
 
-    <WebView
-        android:id="@+id/wvGraphs"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_alignParentTop="true" />
-
     <ToggleButton
-        android:id="@+id/tbShowData"
+        android:id="@+id/tbLog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
         android:textOff="Off"
         android:textOn="On" />
 
@@ -43,34 +40,27 @@
         android:id="@+id/btnRight"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignBaseline="@+id/btnSetZero"
+        android:layout_toRightOf="@+id/btnSetZero"
+        android:layout_marginLeft="20dp"
         android:text="@string/btn_right" />
 
     <Button
         android:id="@+id/btnSetZero"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/tbShowData"
-        android:layout_alignBottom="@+id/tbShowData"
-        android:layout_toLeftOf="@+id/btnRight"
-        android:text="@string/set_zero" />
-
-    <Button
-        android:id="@+id/btnClear"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/btnSetZero"
-        android:layout_alignLeft="@+id/wvGraphs"
-        android:text="@string/btn_clear" />
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="10dp"
+        android:text="@string/btn_set_zero" />
 
     <Button
         android:id="@+id/btnLeft"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBaseline="@+id/btnSetZero"
-        android:layout_alignBottom="@+id/btnSetZero"
         android:layout_toLeftOf="@+id/btnSetZero"
+        android:layout_marginRight="20dp"
         android:text="@string/btn_left" />
 
 </RelativeLayout>
