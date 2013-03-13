@@ -94,13 +94,18 @@ public class AltimeterDB extends SQLiteOpenHelper {
         return cursor;
     }
     
-    public void deleteTrack(int id) {
+    public int deleteTrack(int id) {
+    	
+    	int rowsDeleted;
     	
         SQLiteDatabase db = this.getWritableDatabase();
         
         String[] whereArgs = new String[] { String.valueOf(id) };
         
-        db.delete(TABLE_TRACKS, KEY_TRACKS_ID + " = ?", whereArgs);
+        rowsDeleted = db.delete(TABLE_TRACKS, KEY_TRACKS_ID + " = ?", whereArgs);
+        
         db.close();
+        
+        return rowsDeleted;
     }
 }
