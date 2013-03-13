@@ -163,7 +163,7 @@ public class AltimeterActivity extends Activity implements SensorEventListener,
                     
                     values.put(AltimeterDB.KEY_POINTS_DATE, date);
                     values.put(AltimeterDB.KEY_POINTS_ALTITUDE, customAltitude);
-                    values.put(AltimeterDB.KEY_POINTS_ALTITUDE, trackId);
+                    values.put(AltimeterDB.KEY_POINTS_TRACK_ID, trackId);
                     
                     Uri uri = Uri.parse(AltimeterContentProvider.CONTENT_URI_POINTS.toString());
                     getContentResolver().insert(uri, values);
