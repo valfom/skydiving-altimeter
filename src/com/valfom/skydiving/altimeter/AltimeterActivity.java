@@ -2,14 +2,18 @@ package com.valfom.skydiving.altimeter;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -42,7 +46,9 @@ public class AltimeterActivity extends Activity implements SensorEventListener,
 
 	// private boolean convert = false;
 
-	AltimeterDB db;
+	private Timer timerSavePoints;
+	
+	private Integer trackId = null;
 	
 	// Altitude
 	private int altitude;
@@ -67,8 +73,6 @@ public class AltimeterActivity extends Activity implements SensorEventListener,
 					+ sensorPressure.getResolution() + ", max range "
 					+ sensorPressure.getMaximumRange());
 			
-			db = new AltimeterDB(this);
-
 			tvAltitude = (TextView) findViewById(R.id.tvAltitude);
 			tvAltitudeUnit = (TextView) findViewById(R.id.tvAltitudeUnit);
 			btnSetZero = (Button) findViewById(R.id.btnSetZero);
@@ -83,18 +87,38 @@ public class AltimeterActivity extends Activity implements SensorEventListener,
 
 			tbShowData.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
-						public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
-							if (isChecked) {
+					if (isChecked) {
 
-								DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
-						        startDate = dateFormat.format(new Date());
-							} else {
-								
-								db.addTrack(startDate);
-							}
-						}
-					});
+						DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
+				        startDate = dateFormat.format(new Date());
+				        
+				        ContentValues values = new ContentValues();
+				        
+				        values.put(AltimeterDB.KEY_TRACKS_DATE, startDate);
+				        
+				        Uri uri = Uri.parse(AltimeterContentProvider.CONTENT_URI_TRACKS + "/insert");
+				        Uri url = getContentResolver().insert(uri, values);
+				        
+				        String[] arr = url.toString().split("/");
+				        
+				        trackId = Integer.valueOf(arr[1]);
+				        
+				        timerSavePoints = new Timer();
+				        timerSavePoints.schedule(new savePointsTask(), 0, 1000);
+					} else {
+						
+						trackId = null;
+						
+						if (timerSavePoints != null) {
+
+							timerSavePoints.cancel();
+							timerSavePoints = null;
+			        	}
+					}
+				}
+			});
 
 			// vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
@@ -117,6 +141,36 @@ public class AltimeterActivity extends Activity implements SensorEventListener,
 			sensorManager.registerListener(this, sensorPressure, SensorManager.SENSOR_DELAY_FASTEST);
 		}
 	}
+	
+	private class savePointsTask extends TimerTask {
+
+        @Override
+        public void run() {
+        	
+            runOnUiThread(new Runnable() {
+
+                @Override
+                public void run() {
+                	
+                	int customAltitude;
+                	
+            		customAltitude = altitude - zeroAltitude;
+            		
+            		DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
+			        String date = dateFormat.format(new Date());
+            		
+            		ContentValues values = new ContentValues();
+                    
+                    values.put(AltimeterDB.KEY_POINTS_DATE, date);
+                    values.put(AltimeterDB.KEY_POINTS_ALTITUDE, customAltitude);
+                    values.put(AltimeterDB.KEY_POINTS_ALTITUDE, trackId);
+                    
+                    Uri uri = Uri.parse(AltimeterContentProvider.CONTENT_URI_POINTS.toString());
+                    getContentResolver().insert(uri, values);
+                }
+            });
+        }
+	};
 
 	@Override
 	protected void onDestroy() {

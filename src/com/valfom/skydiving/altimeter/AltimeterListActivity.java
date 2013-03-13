@@ -55,7 +55,7 @@ public class AltimeterListActivity extends ListActivity implements
 	                
 	                for (long id : checkedItems) {
 	                
-	                	Uri uri = Uri.parse(AltimeterContentProvider.CONTENT_URI + "/" + id);
+	                	Uri uri = Uri.parse(AltimeterContentProvider.CONTENT_URI_TRACKS + "/" + id);
 	                    getContentResolver().delete(uri, null, null);
 	                }
 
@@ -88,7 +88,7 @@ public class AltimeterListActivity extends ListActivity implements
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-		return new CursorLoader(this, AltimeterContentProvider.CONTENT_URI,
+		return new CursorLoader(this, AltimeterContentProvider.CONTENT_URI_TRACKS,
                 null, null, null, null);
 	}
 
@@ -108,6 +108,10 @@ public class AltimeterListActivity extends ListActivity implements
 	protected void onListItemClick(ListView l, View v, int position, long id) {
 
 		super.onListItemClick(l, v, position, id);
+		
+		Intent info = new Intent(AltimeterListActivity.this, AltimeterInfoActivity.class);
+		info.putExtra("trackId", id);
+		startActivity(info);
 	}
 
 	@Override

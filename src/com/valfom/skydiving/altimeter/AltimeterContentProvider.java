@@ -4,18 +4,24 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.util.Log;
 
 public class AltimeterContentProvider extends ContentProvider {
 
 	public static final String AUTHORITY = "com.valfom.skydiving.altimeter.provider";
 
-	public static final Uri CONTENT_URI = Uri.parse("content://"
+	public static final Uri CONTENT_URI_TRACKS = Uri.parse("content://"
 			+ AUTHORITY + "/" + AltimeterDB.TABLE_TRACKS);
+	
+	public static final Uri CONTENT_URI_POINTS = Uri.parse("content://"
+			+ AUTHORITY + "/" + AltimeterDB.TABLE_POINTS);
 
-	private static final int URI_TRACKS = 1;
-	private static final int URI_TRACK_ID = 2;
+	private static final int URI_TRACKS = 1; // Get all tracks
+	private static final int URI_TRACK_ID = 2; // Get, delete track with ID
+	private static final int URI_TRACK = 3; // Insert track
+	private static final int URI_POINTS_ID = 4; // Get, delete all points with track ID
+	private static final int URI_POINT = 5; // Insert point with track ID
 
 	private static final UriMatcher uriMatcher;
 
@@ -23,6 +29,9 @@ public class AltimeterContentProvider extends ContentProvider {
 		uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 		uriMatcher.addURI(AUTHORITY, AltimeterDB.TABLE_TRACKS, URI_TRACKS);
 		uriMatcher.addURI(AUTHORITY, AltimeterDB.TABLE_TRACKS + "/#", URI_TRACK_ID);
+		uriMatcher.addURI(AUTHORITY, AltimeterDB.TABLE_TRACKS + "/insert", URI_TRACK);
+		uriMatcher.addURI(AUTHORITY, AltimeterDB.TABLE_POINTS + "/#", URI_POINTS_ID);
+		uriMatcher.addURI(AUTHORITY, AltimeterDB.TABLE_POINTS, URI_POINT);
 	}
 
 	AltimeterDB db;
@@ -43,11 +52,30 @@ public class AltimeterContentProvider extends ContentProvider {
 			String[] selectionArgs, String sortOrder) {
 
 		Cursor cursor = null;
+		SQLiteDatabase sqlDB = db.getReadableDatabase();
+		String id;
 		
-		if (uriMatcher.match(uri) == URI_TRACKS)
-			cursor = db.getAllTracks();
-		else
-			throw new IllegalArgumentException("Wrong URI: " + uri);
+		switch (uriMatcher.match(uri)) {
+			
+			case URI_TRACKS:
+				cursor = db.getAllTracks();
+				break;
+			case URI_TRACK_ID:
+				id = uri.getLastPathSegment();
+				cursor = db.getTrack(Integer.valueOf(id));
+				break;
+			case URI_POINTS_ID:
+				id = uri.getLastPathSegment();
+				
+				String[] columns = new String[] { AltimeterDB.KEY_POINTS_ALTITUDE };
+		        String[] selArgs = new String[] { String.valueOf(id) };
+		        
+		        cursor = sqlDB.query(AltimeterDB.TABLE_POINTS, columns, AltimeterDB.KEY_POINTS_TRACK_ID + "=?",
+		        		selArgs, null, null, null, null);
+				break;
+			default:
+				throw new IllegalArgumentException("Wrong URI: " + uri);
+		}
 		
 		cursor.setNotificationUri(getContext().getContentResolver(), uri);
 		
@@ -56,17 +84,25 @@ public class AltimeterContentProvider extends ContentProvider {
 
 	public int delete(Uri uri, String selection, String[] selectionArgs) {
 
-		Log.d("LALA", "delete, uri" + uri.toString());
-		
 		int rowsDeleted = 0;
+		SQLiteDatabase sqlDB = db.getWritableDatabase();
+		String id;
 		
-		if (uriMatcher.match(uri) == URI_TRACK_ID) {
+		switch(uriMatcher.match(uri)) {
 		
-			Log.d("LALA", "id " + uri.getLastPathSegment());
+		case URI_TRACK_ID:
+		
+			id = uri.getLastPathSegment();
+			rowsDeleted = sqlDB.delete(AltimeterDB.TABLE_TRACKS, AltimeterDB.KEY_TRACKS_ID + "=" + id, null);
 			
-			String id = uri.getLastPathSegment();
+		case URI_POINTS_ID:
 			
-			rowsDeleted = db.deleteTrack(Integer.valueOf(id));
+			id = uri.getLastPathSegment();
+			rowsDeleted += sqlDB.delete(AltimeterDB.TABLE_POINTS, AltimeterDB.KEY_POINTS_TRACK_ID + "=" + id, null);
+			break;
+			
+		default:
+	    	throw new IllegalArgumentException("Unknown URI: " + uri);
 		}
 		
 		getContext().getContentResolver().notifyChange(uri, null);
@@ -76,7 +112,26 @@ public class AltimeterContentProvider extends ContentProvider {
 
 	public Uri insert(Uri uri, ContentValues values) {
 
-		return null;
+		SQLiteDatabase sqlDB = db.getWritableDatabase();
+		long id = 0;
+		
+	    switch (uriMatcher.match(uri)) {
+	    
+	    case URI_TRACK:
+	    	id = sqlDB.insert(AltimeterDB.TABLE_TRACKS, null, values);
+	    	break;
+	    	
+	    case URI_POINT:
+	    	id = sqlDB.insert(AltimeterDB.TABLE_POINTS, null, values);
+	    	break;
+	    
+	    default:
+	    	throw new IllegalArgumentException("Unknown URI: " + uri);
+	    }
+	    
+	    getContext().getContentResolver().notifyChange(uri, null);
+	    
+	    return Uri.parse(AltimeterDB.TABLE_TRACKS + "/" + id);
 	}
 
 	public int update(Uri uri, ContentValues values, String selection,

@@ -21,7 +21,7 @@ public class AltimeterDB extends SQLiteOpenHelper {
     // "points" table
     public static final String KEY_POINTS_ID = "_id";
     public static final String KEY_POINTS_DATE = "date";
-    public static final String KEY_POINTS_NUMBER = "number";
+//    public static final String KEY_POINTS_NUMBER = "number";
     public static final String KEY_POINTS_ALTITUDE = "altitude";
     public static final String KEY_POINTS_TRACK_ID = "track_id";
  
@@ -42,7 +42,7 @@ public class AltimeterDB extends SQLiteOpenHelper {
         String CREATE_POINTS_TABLE = "CREATE TABLE " + TABLE_POINTS + "("
         		+ KEY_POINTS_ID + " INTEGER PRIMARY KEY,"
         		+ KEY_POINTS_DATE + " TEXT,"
-        		+ KEY_POINTS_NUMBER + " INTEGER,"
+//        		+ KEY_POINTS_NUMBER + " INTEGER,"
             	+ KEY_POINTS_ALTITUDE + " INTEGER,"
                 + KEY_POINTS_TRACK_ID + " INTEGER" + ")";
             
@@ -74,7 +74,7 @@ public class AltimeterDB extends SQLiteOpenHelper {
     	
         SQLiteDatabase db = this.getReadableDatabase();
  
-        String[] columns = new String[] { KEY_TRACKS_ID, KEY_TRACKS_DATE };
+        String[] columns = new String[] { KEY_TRACKS_DATE };
         String[] selectionArgs = new String[] { String.valueOf(id) };
         
         Cursor cursor = db.query(TABLE_TRACKS, columns, KEY_TRACKS_ID + "=?",

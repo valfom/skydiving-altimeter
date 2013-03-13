@@ -37,6 +37,9 @@
         <activity
             android:name="com.valfom.skydiving.altimeter.AltimeterListActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name="com.valfom.skydiving.altimeter.AltimeterInfoActivity"
+            android:screenOrientation="portrait" />
 
         <provider
             android:name="com.valfom.skydiving.altimeter.AltimeterContentProvider"
