@@ -51,7 +51,8 @@ public class AltimeterInfoActivity extends Activity {
 	        
         	Timer tSetData = new Timer();
         	
-        	tSetData.schedule(new setGraphsDataTask(), 0, 1000);
+//        	tSetData.schedule(new setGraphsDataTask(), 0, 1000);
+        	tSetData.schedule(new setGraphsDataTask(), 1000);
 	        
 		} else onBackPressed();
 	}
