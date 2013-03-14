@@ -17,8 +17,8 @@ import android.widget.TextView;
 
 public class AltimeterInfoActivity extends Activity {
 
-	WebView wvGraphs;
-	JSONArray altitudeData;
+	private WebView wvGraphs;
+	private long id;
 	
 	@SuppressLint("SetJavaScriptEnabled") 
 	@Override
@@ -34,7 +34,7 @@ public class AltimeterInfoActivity extends Activity {
 		
 		if (intent.hasExtra("trackId")) {
 			
-			long id = intent.getLongExtra("trackId", 0);
+			id = intent.getLongExtra("trackId", 0);
 			
 			Uri uri = Uri.parse(AltimeterContentProvider.CONTENT_URI_TRACKS + "/" + id);
 	        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
@@ -49,28 +49,9 @@ public class AltimeterInfoActivity extends Activity {
 	        wvGraphs.getSettings().setJavaScriptEnabled(true);
 	        wvGraphs.loadUrl("file:///android_asset/graphs/graphs.html");
 	        
-	        uri = Uri.parse(AltimeterContentProvider.CONTENT_URI_POINTS + "/" + id);
-	        cursor = getContentResolver().query(uri, null, null, null, null);
-	        
-	        if (cursor.getCount() > 0) {
-	        	
-	        	altitudeData = new JSONArray();
-	        	
-	        	for (boolean hasItem = cursor.moveToFirst(); hasItem; hasItem = cursor.moveToNext()) {
-
-	        		JSONArray altitudeEntry = new JSONArray();
-	        		
-	        		altitudeEntry.put(cursor.getPosition());
-
-					altitudeEntry.put(cursor.getInt(0));
-
-					altitudeData.put(altitudeEntry);
-	            }
-	        	
-	        	Timer tDelay = new Timer();
-	        	
-	        	tDelay.schedule(new setGraphsDataTask(), 1000);
-	        }
+        	Timer tSetData = new Timer();
+        	
+        	tSetData.schedule(new setGraphsDataTask(), 0, 1000);
 	        
 		} else onBackPressed();
 	}
@@ -79,12 +60,32 @@ public class AltimeterInfoActivity extends Activity {
 
         @Override
         public void run() {
+        	
             runOnUiThread(new Runnable() {
 
                 @Override
                 public void run() {
                 	
-                	wvGraphs.loadUrl("javascript:setGraphsData(" + altitudeData.toString() + ")");
+                	Uri uri = Uri.parse(AltimeterContentProvider.CONTENT_URI_POINTS + "/" + id);
+        	        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+                	
+                	if (cursor.getCount() > 0) {
+        	        	
+                		JSONArray altitudeData = new JSONArray();
+        	        	
+        	        	for (boolean hasItem = cursor.moveToFirst(); hasItem; hasItem = cursor.moveToNext()) {
+
+        	        		JSONArray altitudeEntry = new JSONArray();
+        	        		
+        	        		altitudeEntry.put(cursor.getPosition());
+
+        					altitudeEntry.put(cursor.getInt(0));
+
+        					altitudeData.put(altitudeEntry);
+        	            }
+        	        	
+        	        	wvGraphs.loadUrl("javascript:setGraphsData(" + altitudeData.toString() + ")");
+        	        }
                 }
             });
         }

@@ -15,23 +15,38 @@
     	</style>
     	<script type="text/javascript">
 
-			var aData = [];
-	
 			$(function () {
 	
-				drawGraphs();
+				drawGraphs([]);
 			});
 	
-			function drawGraphs() {
+			function drawGraphs(altitudeData) {
 	
-				$.plot("#placeholder", [aData]);
+				$.plot("#placeholder", 
+				[ { label: "Altitude", data: altitudeData } ], 
+				{
+					series: {
+						lines: { 
+							show: true,
+							lineWidth: 2
+						},
+						shadowSize: 0
+					},
+					xaxis: {
+						min: 0,
+						tickDecimals: 0
+					},
+					yaxis: {
+						min: 0,
+						tickDecimals: 0
+					},
+					legend: { position: "nw" }
+				});
 			}
 	
 			function setGraphsData(altitudeData) {
 	
-				aData = altitudeData;
-				
-				drawGraphs();
+				drawGraphs(altitudeData);
 			}
 
 		</script>
