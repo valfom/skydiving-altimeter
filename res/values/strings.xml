@@ -24,6 +24,8 @@
     <string name="settings_second_altitude">Second altitude</string>
     <string name="settings_third_altitude">Third altitude</string>
     
+    <string name="settings_silent">Silent</string>
+    
     <string name="save">Save</string>
     <string name="cancel">Cancel</string>
     

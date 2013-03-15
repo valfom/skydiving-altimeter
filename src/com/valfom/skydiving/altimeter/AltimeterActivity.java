@@ -36,7 +36,6 @@ public class AltimeterActivity extends Activity implements SensorEventListener,
 	private Sensor sensorPressure;
 	// private Vibrator vibrator;
 	// private PowerManager.WakeLock wakeLock;
-	public AltimeterSettings settings;
 
 	private TextView tvAltitude;
 	private TextView tvAltitudeUnit;
@@ -44,7 +43,7 @@ public class AltimeterActivity extends Activity implements SensorEventListener,
 	private Button btnLeft;
 	private Button btnRight;
 
-	// private boolean convert = false;
+	private boolean convert = false;
 
 	private Timer timerSavePoints;
 	
@@ -192,12 +191,12 @@ public class AltimeterActivity extends Activity implements SensorEventListener,
 				Activity.MODE_PRIVATE);
 		zeroAltitude = sharedPreferences.getInt("zeroAltitude", 0);
 
-		settings = new AltimeterSettings(this);
+		AltimeterSettings settings = new AltimeterSettings(this);
 
 		altitudeUnit = settings.getAltitudeUnit();
 
-		// if (altitudeUnit.equals(getString(R.string.ft))) convert = true;
-		// else convert = false;
+		 if (altitudeUnit.equals(getString(R.string.ft))) convert = true;
+		 else convert = false;
 
 		tvAltitudeUnit.setText(altitudeUnit);
 	}
@@ -253,6 +252,8 @@ public class AltimeterActivity extends Activity implements SensorEventListener,
 				atmosphericPressure);
 
 		customAltitude = altitude - zeroAltitude;
+		
+		if (convert) customAltitude = AltimeterSettings.convertAltitudeToFt(customAltitude);
 
 		tvAltitude.setText(String.valueOf(customAltitude));
 	}

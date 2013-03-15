@@ -22,15 +22,15 @@ public class AltimeterSettings {
         else altitudeUnit = context.getString(R.string.ft);
 	}
 	
-	public int convertAltitudeToFt(int altitude) {
+	public static int convertAltitudeToFt(int altitude) {
 		
 		return (int) (altitude * FT_IN_M);
 	}
 	
-	public int convertAltitudeToM(int altitude) {
-		
-		return (int) (altitude / FT_IN_M);
-	}
+//	public static int convertAltitudeToM(int altitude) {
+//		
+//		return (int) (altitude / FT_IN_M);
+//	}
 	
 	public String getAltitudeUnit() {
 		

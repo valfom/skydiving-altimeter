@@ -6,6 +6,7 @@ import java.util.TimerTask;
 import org.json.JSONArray;
 
 import android.annotation.SuppressLint;
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
@@ -13,12 +14,13 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.webkit.WebView;
-import android.widget.TextView;
 
 public class AltimeterInfoActivity extends Activity {
 
 	private WebView wvGraphs;
 	private long id;
+	
+	private boolean convert = false;
 	
 	@SuppressLint("SetJavaScriptEnabled") 
 	@Override
@@ -28,7 +30,9 @@ public class AltimeterInfoActivity extends Activity {
 		
 		setContentView(R.layout.info);
 		
-		getActionBar().setDisplayHomeAsUpEnabled(true);
+		ActionBar actionBar = getActionBar();
+		
+		actionBar.setDisplayHomeAsUpEnabled(true);
 		
 		Intent intent = getIntent();
 		
@@ -39,24 +43,38 @@ public class AltimeterInfoActivity extends Activity {
 			Uri uri = Uri.parse(AltimeterContentProvider.CONTENT_URI_TRACKS + "/" + id);
 	        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
 	        cursor.moveToFirst();
-	        TextView tvDate = (TextView) findViewById(R.id.tvDate);
-	        tvDate.setText(cursor.getString(0));
+	        
+	        actionBar.setTitle(cursor.getString(0));
 	        
 	        wvGraphs = (WebView) findViewById(R.id.wvGraphs);
-
 	        wvGraphs.setVerticalScrollBarEnabled(false);
 	        wvGraphs.setHorizontalScrollBarEnabled(false);
 	        wvGraphs.getSettings().setJavaScriptEnabled(true);
 	        wvGraphs.loadUrl("file:///android_asset/graphs/graphs.html");
 	        
-        	Timer tSetData = new Timer();
-        	
-//        	tSetData.schedule(new setGraphsDataTask(), 0, 1000);
-        	tSetData.schedule(new setGraphsDataTask(), 1000);
-	        
 		} else onBackPressed();
 	}
 	
+	@Override
+	protected void onResume() {
+
+		super.onResume();
+		
+		String altitudeUnit;
+
+		AltimeterSettings settings = new AltimeterSettings(this);
+
+		altitudeUnit = settings.getAltitudeUnit();
+
+		if (altitudeUnit.equals(getString(R.string.ft))) convert = true;
+		else convert = false;
+		
+		Timer tSetData = new Timer();
+    	
+//    	tSetData.schedule(new setGraphsDataTask(), 0, 1000);
+    	tSetData.schedule(new setGraphsDataTask(), 1000);
+	}
+
 	class setGraphsDataTask extends TimerTask {
 
         @Override
@@ -77,10 +95,16 @@ public class AltimeterInfoActivity extends Activity {
         	        	for (boolean hasItem = cursor.moveToFirst(); hasItem; hasItem = cursor.moveToNext()) {
 
         	        		JSONArray altitudeEntry = new JSONArray();
+        	        		int altitude;
         	        		
         	        		altitudeEntry.put(cursor.getPosition());
 
-        					altitudeEntry.put(cursor.getInt(0));
+        	        		altitude = cursor.getInt(0);
+        	        		
+        	        		if (convert)
+        	        			altitude = AltimeterSettings.convertAltitudeToFt(cursor.getInt(0));
+        	        		
+        					altitudeEntry.put(altitude);
 
         					altitudeData.put(altitudeEntry);
         	            }
@@ -102,6 +126,13 @@ public class AltimeterInfoActivity extends Activity {
 	        	onBackPressed();
 	            
 	            return true;
+	            
+	        case R.id.action_settings:
+	        	
+	        	Intent settings = new Intent(AltimeterInfoActivity.this, AltimeterPreferenceActivity.class);
+	    		startActivity(settings);
+	    		
+	    		return true;
 	        	
 	        default:
 	        	return super.onMenuItemSelected(featureId, item);

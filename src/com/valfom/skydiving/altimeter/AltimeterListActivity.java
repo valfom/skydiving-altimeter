@@ -29,12 +29,12 @@ public class AltimeterListActivity extends ListActivity implements
 		
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		
-		String[] fromColumns = { AltimeterDB.KEY_TRACKS_ID };
+		String[] fromColumns = { AltimeterDB.KEY_TRACKS_DATE };
         int[] toViews = { android.R.id.text1 };
 		
 		adapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_activated_1, 
 				null, fromColumns, toViews, 0);
-		
+        
 		setListAdapter(adapter);
 		
 		getLoaderManager().initLoader(0, null, this);
