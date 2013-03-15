@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
 
@@ -114,7 +115,15 @@ public class AltimeterInfoActivity extends Activity {
                 }
             });
         }
-   };
+	};
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+
+		getMenuInflater().inflate(R.menu.menu_info, menu);
+
+		return true;
+	}
 	
 	@Override
 	public boolean onMenuItemSelected(int featureId, MenuItem item) {
