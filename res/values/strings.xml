@@ -41,5 +41,7 @@
     <string name="btn_set_zero">Set zero</string>
     
     <string name="empty_list">No items</string>
+    
+    <string name="action_calibrate">Calibrate</string>
 
 </resources>

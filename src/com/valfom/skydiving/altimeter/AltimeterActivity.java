@@ -5,7 +5,11 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import com.valfom.skydiving.altimeter.AltimeterCalibrationFragment.OnZeroAltitudeChangedListener;
+
 import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,19 +22,15 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-public class AltimeterActivity extends Activity implements SensorEventListener,
-		OnClickListener {
+public class AltimeterActivity extends Activity implements SensorEventListener, OnZeroAltitudeChangedListener {
 
 	private static final String TAG = "AltimeterActivity";
-	private static final String PREF_FILE_NAME = "SAPrefs";
-	private static final byte STEP = 10;
+	public static final String PREF_FILE_NAME = "SAPrefs";
+	public static final byte STEP = 10;
 
 	private SensorManager sensorManager;
 	private Sensor sensorPressure;
@@ -39,9 +39,6 @@ public class AltimeterActivity extends Activity implements SensorEventListener,
 
 	private TextView tvAltitude;
 	private TextView tvAltitudeUnit;
-	private Button btnSetZero;
-	private Button btnLeft;
-	private Button btnRight;
 
 	private boolean convert = false;
 
@@ -74,13 +71,7 @@ public class AltimeterActivity extends Activity implements SensorEventListener,
 			
 			tvAltitude = (TextView) findViewById(R.id.tvAltitude);
 			tvAltitudeUnit = (TextView) findViewById(R.id.tvAltitudeUnit);
-			btnSetZero = (Button) findViewById(R.id.btnSetZero);
-			btnLeft = (Button) findViewById(R.id.btnLeft);
-			btnRight = (Button) findViewById(R.id.btnRight);
 
-			btnSetZero.setOnClickListener(this);
-			btnLeft.setOnClickListener(this);
-			btnRight.setOnClickListener(this);
 
 			ToggleButton tbShowData = (ToggleButton) findViewById(R.id.tbLog);
 
@@ -227,6 +218,28 @@ public class AltimeterActivity extends Activity implements SensorEventListener,
 			startActivity(list);
 
 			break;
+		case R.id.action_calibrate:
+			
+			FragmentManager fragmentManager = getFragmentManager();
+			FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+			fragmentTransaction.setCustomAnimations(android.R.animator.fade_in, android.R.animator.fade_out);
+			
+			AltimeterCalibrationFragment  calibrationFragment = (AltimeterCalibrationFragment) 
+					fragmentManager.findFragmentById(R.id.calibration_container);
+			
+			if (calibrationFragment == null) {
+				
+				fragmentTransaction.add(R.id.calibration_container, new AltimeterCalibrationFragment());
+//				fragmentTransaction.addToBackStack(null);
+			
+			} else {
+				
+				fragmentTransaction.remove(calibrationFragment);
+			}
+			
+			fragmentTransaction.commit();
+			
+			break;
 		default:
 			break;
 		}
@@ -259,28 +272,22 @@ public class AltimeterActivity extends Activity implements SensorEventListener,
 	}
 
 	@Override
-	public void onClick(View v) {
-
-		switch (v.getId()) {
-
-		case R.id.btnSetZero:
-			zeroAltitude = altitude;
-			break;
-
-		case R.id.btnLeft:
-			zeroAltitude += STEP;
-			break;
-
-		case R.id.btnRight:
-			zeroAltitude -= STEP;
-			break;
-			
-		default:
-			break;
+	public void onZeroAltitudeChanged(int code) {
+		
+		switch (code) {
+		
+			case AltimeterCalibrationFragment.CODE_DECREASE:
+				zeroAltitude += STEP;
+				break;
+			case AltimeterCalibrationFragment.CODE_SET_TO_ZERO:
+				zeroAltitude = altitude;
+				break;
+			case AltimeterCalibrationFragment.CODE_INCREASE:
+				zeroAltitude -= STEP;
+				break;
 		}
-
-		SharedPreferences sharedPreferences = getSharedPreferences(
-				PREF_FILE_NAME, Activity.MODE_PRIVATE);
+		
+		SharedPreferences sharedPreferences = getSharedPreferences(PREF_FILE_NAME, Activity.MODE_PRIVATE);
 		SharedPreferences.Editor editor = sharedPreferences.edit();
 		editor.putInt("zeroAltitude", zeroAltitude);
 		editor.apply();
