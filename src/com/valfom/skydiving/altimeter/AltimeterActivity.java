@@ -70,7 +70,6 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 			tvAltitude = (TextView) findViewById(R.id.tvAltitude);
 			tvAltitudeUnit = (TextView) findViewById(R.id.tvAltitudeUnit);
 
-
 			ToggleButton tbShowData = (ToggleButton) findViewById(R.id.tbLog);
 
 			tbShowData.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {

@@ -20,7 +20,8 @@ public class AltimeterSimpleCursorAdapter extends SimpleCursorAdapter {
 		this.context = context;
 	}
 	
-	public int getRowType(int position) {
+	@Override
+	public int getItemViewType(int position) {
 		
 		int type;
 		Cursor cursor;
@@ -44,7 +45,7 @@ public class AltimeterSimpleCursorAdapter extends SimpleCursorAdapter {
 			
 			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			
-			type = getRowType(position); 
+			type = getItemViewType(position); 
 			
 			if (type == 1) {
 			
@@ -64,10 +65,19 @@ public class AltimeterSimpleCursorAdapter extends SimpleCursorAdapter {
 				
 				String date = cursor.getString(cursor.getColumnIndex(AltimeterDB.KEY_TRACKS_DATE));
 				
-				tvDate.setText("Header " + date);
+				tvDate.setText(date);
 			}
 		}
 	    
         return convertView;
     }
+
+	@Override
+	public boolean isEnabled(int position) {
+		
+		if (getItemViewType(position) == 1) return true;
+		
+		return false;
+	}
+	
 }

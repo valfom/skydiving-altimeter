@@ -6,7 +6,6 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
-import android.util.Log;
 
 public class AltimeterContentProvider extends ContentProvider {
 
@@ -149,8 +148,6 @@ public class AltimeterContentProvider extends ContentProvider {
 	    			" WHERE " + AltimeterDB.KEY_TRACKS_DATE + "=\"" + date + "\"", null);
 	    	
 	    	if (cursor.getCount() == 0) {
-	    		
-	    		Log.d("LALA", "No header");
 	    		
 	    		ContentValues vals = new ContentValues();
 	    		
