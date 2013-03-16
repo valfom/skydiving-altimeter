@@ -28,7 +28,7 @@
 
 			$(function () {
 			
-				drawGraphs([]);
+				drawGraphs([], []);
 	
 				addPanControls("<", { left: -100 });
 				addPanControls(">", { left: 100 });
@@ -66,30 +66,34 @@
 						});
 			}
 			
-			function drawGraphs(altitudeData) {
+			function drawGraphs(altitudeData, verticalSpeedData) {
+	
+				var data = [ { data: altitudeData, label: "Altitude", lines: { show: true, lineWidth: 2 }, shadowSize: 0 },
+						 { data: verticalSpeedData, label: "Vertical Speed", yaxis: 2, lines: { show: true, lineWidth: 2 }, shadowSize: 0 } ];
 	
 				plot = $.plot("#placeholder", 
-				[ { label: "Altitude", data: altitudeData } ], 
+				data, 
 				{
-					series: {
-						lines: { 
-							show: true,
-							lineWidth: 2
-						},
-						shadowSize: 0
-					},
-					xaxis: {
+					xaxes: [ {
 						min: 0,
 						tickDecimals: 0,
 						panRange: [ 0, altitudeData.length - 1 ],
 						zoomRange: [ 0, altitudeData.length - 1 ]
-					},
-					yaxis: {
+					} ],
+					yaxes: [ {
 						min: 0,
 						tickDecimals: 0,
 						panRange: false,
 						zoomRange: false
 					},
+					{
+						min: 0,
+						tickDecimals: 0,
+						panRange: false,
+						zoomRange: false,
+						position: "right"
+					} ],
+					colors: [ "#ff0000", "#0099ff" ],
 					legend: { position: "nw" },
 					zoom: { 
 						interactive: false,
@@ -100,9 +104,9 @@
 				});
 			}
 	
-			function setGraphsData(altitudeData) {
+			function setGraphsData(altitudeData, verticalSpeedData) {
 	
-				drawGraphs(altitudeData);
+				drawGraphs(altitudeData, verticalSpeedData);
 			}
 
 		</script>

@@ -67,7 +67,7 @@ public class AltimeterContentProvider extends ContentProvider {
 			case URI_POINTS_ID:
 				id = uri.getLastPathSegment();
 				
-				String[] columns = new String[] { AltimeterDB.KEY_POINTS_ALTITUDE };
+				String[] columns = new String[] { AltimeterDB.KEY_POINTS_ALTITUDE, AltimeterDB.KEY_POINTS_SPEED };
 		        String[] selArgs = new String[] { String.valueOf(id) };
 		        
 		        cursor = sqlDB.query(AltimeterDB.TABLE_POINTS, columns, AltimeterDB.KEY_POINTS_TRACK_ID + "=?",

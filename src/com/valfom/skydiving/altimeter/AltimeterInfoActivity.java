@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
@@ -93,25 +94,36 @@ public class AltimeterInfoActivity extends Activity {
                 	if (cursor.getCount() > 0) {
         	        	
                 		JSONArray altitudeData = new JSONArray();
+                		JSONArray verticalSpeedData = new JSONArray();
         	        	
         	        	for (boolean hasItem = cursor.moveToFirst(); hasItem; hasItem = cursor.moveToNext()) {
 
         	        		JSONArray altitudeEntry = new JSONArray();
-        	        		int altitude;
+        	        		JSONArray verticalSpeedEntry = new JSONArray();
+        	        		int altitude, verticalSpeed;
         	        		
         	        		altitudeEntry.put(cursor.getPosition());
+        	        		verticalSpeedEntry.put(cursor.getPosition());
 
         	        		altitude = cursor.getInt(cursor.getColumnIndex(AltimeterDB.KEY_POINTS_ALTITUDE));
+        	        		verticalSpeed = cursor.getInt(cursor.getColumnIndex(AltimeterDB.KEY_POINTS_SPEED));
         	        		
-        	        		if (convert)
-        	        			altitude = AltimeterSettings.convertAltitudeToFt(cursor.getInt(0));
+        	        		if (convert) {
+
+        	        			altitude = AltimeterSettings.convertAltitudeToFt(altitude);
+        	        			verticalSpeed = AltimeterSettings.convertAltitudeToFt(verticalSpeed);
+        	        		}
         	        		
         					altitudeEntry.put(altitude);
+        					verticalSpeedEntry.put(verticalSpeed);
 
         					altitudeData.put(altitudeEntry);
+        					verticalSpeedData.put(verticalSpeedEntry);
         	            }
         	        	
-        	        	wvGraphs.loadUrl("javascript:setGraphsData(" + altitudeData.toString() + ")");
+        	        	wvGraphs.loadUrl("javascript:setGraphsData(" + altitudeData.toString() + ", " + verticalSpeedData.toString() + ")");
+        	        	Log.d("LALA", altitudeData.toString());
+        	        	Log.d("LALA", verticalSpeedData.toString());
         	        }
                 }
             });

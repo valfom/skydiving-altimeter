@@ -50,6 +50,10 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 	private int altitude;
 	private int zeroAltitude;
 	
+	// Vertical speed
+	private Integer firstAltitude = null;
+	private Integer secondAltitude = null;
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
@@ -78,7 +82,6 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 
 					if (isChecked) {
 
-//						DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
 						DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
 				        String startDate = dateFormat.format(new Date());
 				        dateFormat = DateFormat.getTimeInstance(DateFormat.MEDIUM);
@@ -108,6 +111,9 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 							timerSavePoints.cancel();
 							timerSavePoints = null;
 			        	}
+						
+						firstAltitude = null;
+						secondAltitude = null;
 					}
 				}
 			});
@@ -145,8 +151,20 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
                 public void run() {
                 	
                 	int customAltitude;
+                	int verticalSpeed = 0;
                 	
             		customAltitude = altitude - zeroAltitude;
+            		
+            		if (firstAltitude != null) {
+            			
+            			int diffAltitude;
+            			
+            			secondAltitude = customAltitude;
+            			
+            			diffAltitude = Math.abs(secondAltitude - firstAltitude);
+            			verticalSpeed = diffAltitude;
+            			
+            		} else firstAltitude = customAltitude;
             		
             		DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
 			        String date = dateFormat.format(new Date());
@@ -155,6 +173,7 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
                     
                     values.put(AltimeterDB.KEY_POINTS_DATE, date);
                     values.put(AltimeterDB.KEY_POINTS_ALTITUDE, customAltitude);
+                    values.put(AltimeterDB.KEY_POINTS_SPEED, verticalSpeed);
                     values.put(AltimeterDB.KEY_POINTS_TRACK_ID, trackId);
                     
                     Uri uri = Uri.parse(AltimeterContentProvider.CONTENT_URI_POINTS.toString());

@@ -23,6 +23,7 @@ public class AltimeterDB extends SQLiteOpenHelper {
     public static final String KEY_POINTS_ID = "_id";
     public static final String KEY_POINTS_DATE = "date";
     public static final String KEY_POINTS_ALTITUDE = "altitude";
+    public static final String KEY_POINTS_SPEED = "speed";
     public static final String KEY_POINTS_TRACK_ID = "track_id";
  
     public AltimeterDB(Context context) {
@@ -45,6 +46,7 @@ public class AltimeterDB extends SQLiteOpenHelper {
         		+ KEY_POINTS_ID + " INTEGER PRIMARY KEY,"
         		+ KEY_POINTS_DATE + " TEXT,"
             	+ KEY_POINTS_ALTITUDE + " INTEGER,"
+            	+ KEY_POINTS_SPEED + " INTEGER,"
                 + KEY_POINTS_TRACK_ID + " INTEGER" + ")";
             
         db.execSQL(CREATE_POINTS_TABLE);
