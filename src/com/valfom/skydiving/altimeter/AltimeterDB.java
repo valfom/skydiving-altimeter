@@ -1,6 +1,5 @@
 package com.valfom.skydiving.altimeter;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -17,11 +16,12 @@ public class AltimeterDB extends SQLiteOpenHelper {
     // "tracks" table
     public static final String KEY_TRACKS_ID = "_id";
     public static final String KEY_TRACKS_DATE = "date";
+    public static final String KEY_TRACKS_TIME = "time";
+    public static final String KEY_TRACKS_TYPE = "type";
     
     // "points" table
     public static final String KEY_POINTS_ID = "_id";
     public static final String KEY_POINTS_DATE = "date";
-//    public static final String KEY_POINTS_NUMBER = "number";
     public static final String KEY_POINTS_ALTITUDE = "altitude";
     public static final String KEY_POINTS_TRACK_ID = "track_id";
  
@@ -35,14 +35,15 @@ public class AltimeterDB extends SQLiteOpenHelper {
     	
         String CREATE_TRACKS_TABLE = "CREATE TABLE " + TABLE_TRACKS + "("
         	+ KEY_TRACKS_ID + " INTEGER PRIMARY KEY,"
-        	+ KEY_TRACKS_DATE + " TEXT" + ")";
+        	+ KEY_TRACKS_DATE + " TEXT,"
+        	+ KEY_TRACKS_TIME + " TEXT,"
+        	+ KEY_TRACKS_TYPE + " INTEGER" + ")";
         
         db.execSQL(CREATE_TRACKS_TABLE);
         
         String CREATE_POINTS_TABLE = "CREATE TABLE " + TABLE_POINTS + "("
         		+ KEY_POINTS_ID + " INTEGER PRIMARY KEY,"
         		+ KEY_POINTS_DATE + " TEXT,"
-//        		+ KEY_POINTS_NUMBER + " INTEGER,"
             	+ KEY_POINTS_ALTITUDE + " INTEGER,"
                 + KEY_POINTS_TRACK_ID + " INTEGER" + ")";
             
@@ -57,24 +58,12 @@ public class AltimeterDB extends SQLiteOpenHelper {
  
         onCreate(db);
     }
-    
-    public void addTrack(String date) {
-    	
-        SQLiteDatabase db = this.getWritableDatabase();
- 
-        ContentValues values = new ContentValues();
-        
-        values.put(KEY_TRACKS_DATE, date);
- 
-        db.insert(TABLE_TRACKS, null, values);
-        db.close();
-    }
  
     public Cursor getTrack(int id) {
     	
         SQLiteDatabase db = this.getReadableDatabase();
  
-        String[] columns = new String[] { KEY_TRACKS_DATE };
+        String[] columns = new String[] { KEY_TRACKS_DATE, KEY_TRACKS_TIME, KEY_TRACKS_TYPE };
         String[] selectionArgs = new String[] { String.valueOf(id) };
         
         Cursor cursor = db.query(TABLE_TRACKS, columns, KEY_TRACKS_ID + "=?",
@@ -87,25 +76,10 @@ public class AltimeterDB extends SQLiteOpenHelper {
     	
         SQLiteDatabase db = this.getReadableDatabase();
         
-        String[] columns = new String[] { KEY_TRACKS_ID, KEY_TRACKS_DATE };
+        String[] columns = new String[] { KEY_TRACKS_ID, KEY_TRACKS_DATE, KEY_TRACKS_TIME, KEY_TRACKS_TYPE };
         
         Cursor cursor = db.query(TABLE_TRACKS, columns, null, null, null, null, null);
         
         return cursor;
-    }
-    
-    public int deleteTrack(int id) {
-    	
-    	int rowsDeleted;
-    	
-        SQLiteDatabase db = this.getWritableDatabase();
-        
-        String[] whereArgs = new String[] { String.valueOf(id) };
-        
-        rowsDeleted = db.delete(TABLE_TRACKS, KEY_TRACKS_ID + " = ?", whereArgs);
-        
-        db.close();
-        
-        return rowsDeleted;
     }
 }

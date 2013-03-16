@@ -15,12 +15,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AbsListView.MultiChoiceModeListener;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 
 public class AltimeterListActivity extends ListActivity implements 
 		LoaderManager.LoaderCallbacks<Cursor> {
 
-	private SimpleCursorAdapter adapter;
+	private AltimeterSimpleCursorAdapter adapter;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -30,9 +29,9 @@ public class AltimeterListActivity extends ListActivity implements
 		getActionBar().setDisplayHomeAsUpEnabled(true);
 		
 		String[] fromColumns = { AltimeterDB.KEY_TRACKS_DATE };
-        int[] toViews = { android.R.id.text1 };
-		
-		adapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_activated_1, 
+        int[] toViews = { R.id.tvTime };
+        
+        adapter = new AltimeterSimpleCursorAdapter(this, R.layout.list_row, 
 				null, fromColumns, toViews, 0);
         
 		setListAdapter(adapter);

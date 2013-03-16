@@ -5,8 +5,6 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.valfom.skydiving.altimeter.AltimeterCalibrationFragment.OnZeroAltitudeChangedListener;
-
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
@@ -25,6 +23,8 @@ import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 import android.widget.ToggleButton;
+
+import com.valfom.skydiving.altimeter.AltimeterCalibrationFragment.OnZeroAltitudeChangedListener;
 
 public class AltimeterActivity extends Activity implements SensorEventListener, OnZeroAltitudeChangedListener {
 
@@ -50,8 +50,6 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 	private int altitude;
 	private int zeroAltitude;
 	
-	private String startDate;
-
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
@@ -81,12 +79,17 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 
 					if (isChecked) {
 
-						DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
-				        startDate = dateFormat.format(new Date());
+//						DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
+						DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
+				        String startDate = dateFormat.format(new Date());
+				        dateFormat = DateFormat.getTimeInstance(DateFormat.MEDIUM);
+				        String startTime = dateFormat.format(new Date());
 				        
 				        ContentValues values = new ContentValues();
 				        
 				        values.put(AltimeterDB.KEY_TRACKS_DATE, startDate);
+				        values.put(AltimeterDB.KEY_TRACKS_TIME, startTime);
+				        values.put(AltimeterDB.KEY_TRACKS_TYPE, 1);
 				        
 				        Uri uri = Uri.parse(AltimeterContentProvider.CONTENT_URI_TRACKS + "/insert");
 				        Uri url = getContentResolver().insert(uri, values);

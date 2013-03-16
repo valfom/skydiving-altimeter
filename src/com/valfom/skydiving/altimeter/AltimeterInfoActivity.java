@@ -45,7 +45,8 @@ public class AltimeterInfoActivity extends Activity {
 	        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
 	        cursor.moveToFirst();
 	        
-	        actionBar.setTitle(cursor.getString(0));
+	        actionBar.setTitle(cursor.getString(cursor.getColumnIndex(AltimeterDB.KEY_TRACKS_DATE)) + " " 
+	        		+ cursor.getString(cursor.getColumnIndex(AltimeterDB.KEY_TRACKS_TIME)) );
 	        
 	        wvGraphs = (WebView) findViewById(R.id.wvGraphs);
 	        wvGraphs.setVerticalScrollBarEnabled(false);
@@ -100,7 +101,7 @@ public class AltimeterInfoActivity extends Activity {
         	        		
         	        		altitudeEntry.put(cursor.getPosition());
 
-        	        		altitude = cursor.getInt(0);
+        	        		altitude = cursor.getInt(cursor.getColumnIndex(AltimeterDB.KEY_POINTS_ALTITUDE));
         	        		
         	        		if (convert)
         	        			altitude = AltimeterSettings.convertAltitudeToFt(cursor.getInt(0));

@@ -6,6 +6,7 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.util.Log;
 
 public class AltimeterContentProvider extends ContentProvider {
 
@@ -34,7 +35,7 @@ public class AltimeterContentProvider extends ContentProvider {
 		uriMatcher.addURI(AUTHORITY, AltimeterDB.TABLE_POINTS, URI_POINT);
 	}
 
-	AltimeterDB db;
+	private AltimeterDB db;
 
 	public boolean onCreate() {
 
@@ -93,6 +94,29 @@ public class AltimeterContentProvider extends ContentProvider {
 		case URI_TRACK_ID:
 		
 			id = uri.getLastPathSegment();
+			
+			Cursor cursor = sqlDB.rawQuery("SELECT " + AltimeterDB.KEY_TRACKS_DATE + " FROM " + AltimeterDB.TABLE_TRACKS + 
+	    			" WHERE " + AltimeterDB.KEY_TRACKS_ID + "=" + id, null);
+			
+			cursor.moveToFirst();
+			
+			String date = cursor.getString(cursor.getColumnIndex(AltimeterDB.KEY_TRACKS_DATE));
+	    	
+			Cursor cursor1 = sqlDB.rawQuery("SELECT " + AltimeterDB.KEY_TRACKS_ID + ", " + AltimeterDB.KEY_TRACKS_TYPE + " FROM " + AltimeterDB.TABLE_TRACKS + 
+	    			" WHERE " + AltimeterDB.KEY_TRACKS_DATE + "=\"" + date + "\" AND " + AltimeterDB.KEY_TRACKS_ID + " <> " + id, null);
+			
+			if (cursor1.getCount() == 1) {
+				
+				cursor1.moveToFirst();
+				
+				if (cursor1.getInt(cursor1.getColumnIndex(AltimeterDB.KEY_TRACKS_TYPE)) == 2) {
+					
+					int sectionId = cursor1.getInt(cursor1.getColumnIndex(AltimeterDB.KEY_TRACKS_ID));
+					
+					sqlDB.delete(AltimeterDB.TABLE_TRACKS, AltimeterDB.KEY_TRACKS_ID + "=" + sectionId, null);
+				}
+			}
+			
 			rowsDeleted = sqlDB.delete(AltimeterDB.TABLE_TRACKS, AltimeterDB.KEY_TRACKS_ID + "=" + id, null);
 			
 		case URI_POINTS_ID:
@@ -118,7 +142,26 @@ public class AltimeterContentProvider extends ContentProvider {
 	    switch (uriMatcher.match(uri)) {
 	    
 	    case URI_TRACK:
+	    	
+	    	String date = values.getAsString(AltimeterDB.KEY_TRACKS_DATE);
+	    	
+	    	Cursor cursor = sqlDB.rawQuery("SELECT " + AltimeterDB.KEY_TRACKS_ID + " FROM " + AltimeterDB.TABLE_TRACKS + 
+	    			" WHERE " + AltimeterDB.KEY_TRACKS_DATE + "=\"" + date + "\"", null);
+	    	
+	    	if (cursor.getCount() == 0) {
+	    		
+	    		Log.d("LALA", "No header");
+	    		
+	    		ContentValues vals = new ContentValues();
+	    		
+	    		vals.put(AltimeterDB.KEY_TRACKS_DATE, date);
+	    		vals.put(AltimeterDB.KEY_TRACKS_TYPE, 2);
+	    		
+	    		sqlDB.insert(AltimeterDB.TABLE_TRACKS, null, vals);
+	    	}
+	    	
 	    	id = sqlDB.insert(AltimeterDB.TABLE_TRACKS, null, values);
+	    	
 	    	break;
 	    	
 	    case URI_POINT:
