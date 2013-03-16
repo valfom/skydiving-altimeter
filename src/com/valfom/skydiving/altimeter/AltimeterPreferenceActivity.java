@@ -63,7 +63,7 @@ public class AltimeterPreferenceActivity extends PreferenceActivity implements O
 		Uri ringtoneUri = Uri.parse(sharedPreferences.getString(KEY_SOUND, "Silent"));
 		Ringtone ringtone = RingtoneManager.getRingtone(this, ringtoneUri);
 		
-		String summary = "Silent";
+		String summary = getString(R.string.settings_silent);
 		
 		if (ringtone != null) summary = ringtone.getTitle(this);
 		

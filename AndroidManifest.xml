@@ -5,7 +5,7 @@
     android:versionName="1.0" >
 
     <uses-sdk
-        android:minSdkVersion="9"
+        android:minSdkVersion="11"
         android:targetSdkVersion="17" />
 
     <uses-feature
@@ -14,6 +14,7 @@
 
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
         android:allowBackup="true"
@@ -33,6 +34,17 @@
         <activity
             android:name="com.valfom.skydiving.altimeter.AltimeterPreferenceActivity"
             android:screenOrientation="portrait" />
+        <activity
+            android:name="com.valfom.skydiving.altimeter.AltimeterListActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name="com.valfom.skydiving.altimeter.AltimeterInfoActivity"
+            android:screenOrientation="portrait" />
+
+        <provider
+            android:name="com.valfom.skydiving.altimeter.AltimeterContentProvider"
+            android:authorities="com.valfom.skydiving.altimeter.provider"
+            android:exported="false" />
     </application>
 
 </manifest>
