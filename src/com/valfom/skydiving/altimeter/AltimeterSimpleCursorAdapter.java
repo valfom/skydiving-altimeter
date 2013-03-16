@@ -1,6 +1,8 @@
 package com.valfom.skydiving.altimeter;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,6 +13,8 @@ import android.widget.TextView;
 public class AltimeterSimpleCursorAdapter extends SimpleCursorAdapter {
 
 	private Context context;
+	private boolean logging;
+	private int trackId;
 	
 	public AltimeterSimpleCursorAdapter(Context context, int layout, Cursor c,
 			String[] from, int[] to, int flags) {
@@ -18,6 +22,12 @@ public class AltimeterSimpleCursorAdapter extends SimpleCursorAdapter {
 		super(context, layout, c, from, to, flags);
 		
 		this.context = context;
+		
+		SharedPreferences sharedPreferences = context.getSharedPreferences(AltimeterActivity.PREF_FILE_NAME, Activity.MODE_PRIVATE);
+		
+		logging = sharedPreferences.getBoolean("logging", false);
+		
+		if (logging) trackId = sharedPreferences.getInt("trackId", 0);
 	}
 	
 	@Override
@@ -52,10 +62,17 @@ public class AltimeterSimpleCursorAdapter extends SimpleCursorAdapter {
 				convertView = inflater.inflate(R.layout.list_row, null, true);
 				
 				TextView tvTime = (TextView) convertView.findViewById(R.id.tvTime);
-				
 				String time = cursor.getString(cursor.getColumnIndex(AltimeterDB.KEY_TRACKS_TIME));
-				
 				tvTime.setText(time);
+				
+				if (logging) {
+					 
+					if (getItemId(position) == trackId) {
+						
+						TextView tvLive = (TextView) convertView.findViewById(R.id.tvLive);
+						tvLive.setVisibility(View.VISIBLE);
+					}
+				}
 				
 			} else if (type == 2) {
 				

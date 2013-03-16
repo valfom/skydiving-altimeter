@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.ToggleButton;
 
 import com.valfom.skydiving.altimeter.AltimeterCalibrationFragment.OnZeroAltitudeChangedListener;
@@ -36,6 +37,9 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 	private Sensor sensorPressure;
 	// private Vibrator vibrator;
 	// private PowerManager.WakeLock wakeLock;
+	
+	private long lastBackPressTime = 0;
+	private Toast toastOnExit;
 
 	private TextView tvAltitude;
 	private TextView tvAltitudeUnit;
@@ -80,6 +84,9 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 
 				public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 
+					SharedPreferences sharedPreferences = getSharedPreferences(PREF_FILE_NAME, Activity.MODE_PRIVATE);
+					SharedPreferences.Editor editor = sharedPreferences.edit();
+					
 					if (isChecked) {
 
 						DateFormat dateFormat = DateFormat.getDateInstance(DateFormat.SHORT);
@@ -102,6 +109,10 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 				        
 				        timerSavePoints = new Timer();
 				        timerSavePoints.schedule(new savePointsTask(), 0, 1000);
+						
+						editor.putBoolean("logging", true);
+						editor.putInt("trackId", trackId);
+						
 					} else {
 						
 						trackId = null;
@@ -114,7 +125,12 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 						
 						firstAltitude = null;
 						secondAltitude = null;
+						
+						editor.putBoolean("logging", false);
+						editor.remove("trackId");
 					}
+					
+					editor.apply();
 				}
 			});
 
@@ -187,6 +203,22 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 	protected void onDestroy() {
 
 		super.onDestroy();
+		
+		if (timerSavePoints != null) {
+
+			timerSavePoints.cancel();
+			timerSavePoints = null;
+    	}
+		
+		SharedPreferences sharedPreferences = getSharedPreferences(PREF_FILE_NAME, Activity.MODE_PRIVATE);
+		
+		if (sharedPreferences.getBoolean("logging", false)) {
+		
+			SharedPreferences.Editor editor = sharedPreferences.edit();
+			editor.putBoolean("logging", false);
+			editor.remove("trackId");
+			editor.apply();
+		}
 
 		sensorManager.unregisterListener(this);
 	}
@@ -312,5 +344,22 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 		SharedPreferences.Editor editor = sharedPreferences.edit();
 		editor.putInt("zeroAltitude", zeroAltitude);
 		editor.apply();
+	}
+	
+	@Override
+	public void onBackPressed() {
+		
+		if (lastBackPressTime < (System.currentTimeMillis() - 2000)) {
+			
+		    toastOnExit = Toast.makeText(this, getString(R.string.message_on_exit), Toast.LENGTH_SHORT);
+		    toastOnExit.show();
+		    lastBackPressTime = System.currentTimeMillis();
+		    
+		  } else {
+		    
+			  if (toastOnExit != null) toastOnExit.cancel();
+			  
+			  super.onBackPressed();
+		 }
 	}
 }

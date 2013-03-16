@@ -29,11 +29,6 @@
 			$(function () {
 			
 				drawGraphs([], []);
-	
-				addPanControls("<", { left: -100 });
-				addPanControls(">", { left: 100 });
-				addZoomControls();
-				addZoomOutControls();
 			});
 			
 			function addPanControls(dir, offset) {
@@ -68,8 +63,8 @@
 			
 			function drawGraphs(altitudeData, verticalSpeedData) {
 	
-				var data = [ { data: altitudeData, label: "Altitude", lines: { show: true, lineWidth: 2 }, shadowSize: 0 },
-						 { data: verticalSpeedData, label: "Vertical Speed", yaxis: 2, lines: { show: true, lineWidth: 2 }, shadowSize: 0 } ];
+				var data = [ { data: altitudeData, label: "Altitude", lines: { show: true, lineWidth: 1 }, shadowSize: 0 },
+						 { data: verticalSpeedData, label: "Vertical Speed", yaxis: 2, lines: { show: true, lineWidth: 1 }, shadowSize: 0 } ];
 	
 				plot = $.plot("#placeholder", 
 				data, 
@@ -107,6 +102,14 @@
 			function setGraphsData(altitudeData, verticalSpeedData) {
 	
 				drawGraphs(altitudeData, verticalSpeedData);
+			}
+			
+			function addControlls() {
+			
+				addPanControls("<", { left: -100 });
+				addPanControls(">", { left: 100 });
+				addZoomControls();
+				addZoomOutControls();
 			}
 
 		</script>

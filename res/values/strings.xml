@@ -40,7 +40,10 @@
     <string name="btn_right">&gt;</string>
     <string name="btn_set_zero">Set zero</string>
     
+    <string name="live">Live</string>
+    
     <string name="empty_list">No items</string>
+    <string name="message_on_exit">Press Back button again to exit</string>
     
     <string name="action_calibrate">Calibrate</string>
 

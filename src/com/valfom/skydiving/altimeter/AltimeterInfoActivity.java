@@ -9,10 +9,10 @@ import android.annotation.SuppressLint;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
@@ -55,6 +55,22 @@ public class AltimeterInfoActivity extends Activity {
 	        wvGraphs.getSettings().setJavaScriptEnabled(true);
 	        wvGraphs.loadUrl("file:///android_asset/graphs/graphs.html");
 	        
+	        Timer tSetData = new Timer();
+	    	
+			SharedPreferences sharedPreferences = getSharedPreferences(AltimeterActivity.PREF_FILE_NAME, Activity.MODE_PRIVATE);
+			
+			boolean logging = sharedPreferences.getBoolean("logging", false);
+			
+			if (logging && (sharedPreferences.getInt("trackId", 0) == id))  {
+				
+				tSetData.schedule(new setGraphsDataTask(), 0, 1000);
+				
+			} else { 
+				
+				wvGraphs.loadUrl("javascript:addControlls()");
+				tSetData.schedule(new setGraphsDataTask(), 1000);
+			}
+	        
 		} else onBackPressed();
 	}
 	
@@ -71,11 +87,6 @@ public class AltimeterInfoActivity extends Activity {
 
 		if (altitudeUnit.equals(getString(R.string.ft))) convert = true;
 		else convert = false;
-		
-		Timer tSetData = new Timer();
-    	
-//    	tSetData.schedule(new setGraphsDataTask(), 0, 1000);
-    	tSetData.schedule(new setGraphsDataTask(), 1000);
 	}
 
 	class setGraphsDataTask extends TimerTask {
@@ -122,8 +133,6 @@ public class AltimeterInfoActivity extends Activity {
         	            }
         	        	
         	        	wvGraphs.loadUrl("javascript:setGraphsData(" + altitudeData.toString() + ", " + verticalSpeedData.toString() + ")");
-        	        	Log.d("LALA", altitudeData.toString());
-        	        	Log.d("LALA", verticalSpeedData.toString());
         	        }
                 }
             });
