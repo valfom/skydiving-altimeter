@@ -133,7 +133,9 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 					editor.apply();
 				}
 			});
-
+			
+			restoreSharedPreferences();
+			
 			// vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 
 			// PowerManager powerManager = (PowerManager)
@@ -153,6 +155,19 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 			// as an absolute value (in microseconds).
 
 			sensorManager.registerListener(this, sensorPressure, SensorManager.SENSOR_DELAY_FASTEST);
+		}
+	}
+	
+	private void restoreSharedPreferences() {
+		
+		SharedPreferences sharedPreferences = getSharedPreferences(PREF_FILE_NAME, Activity.MODE_PRIVATE);
+		
+		if (sharedPreferences.getBoolean("logging", false)) {
+		
+			SharedPreferences.Editor editor = sharedPreferences.edit();
+			editor.putBoolean("logging", false);
+			editor.remove("trackId");
+			editor.apply();
 		}
 	}
 	
@@ -210,15 +225,7 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 			timerSavePoints = null;
     	}
 		
-		SharedPreferences sharedPreferences = getSharedPreferences(PREF_FILE_NAME, Activity.MODE_PRIVATE);
-		
-		if (sharedPreferences.getBoolean("logging", false)) {
-		
-			SharedPreferences.Editor editor = sharedPreferences.edit();
-			editor.putBoolean("logging", false);
-			editor.remove("trackId");
-			editor.apply();
-		}
+		restoreSharedPreferences();
 
 		sensorManager.unregisterListener(this);
 	}
@@ -239,8 +246,8 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 
 		altitudeUnit = settings.getAltitudeUnit();
 
-		 if (altitudeUnit.equals(getString(R.string.ft))) convert = true;
-		 else convert = false;
+		if (altitudeUnit.equals(getString(R.string.ft))) convert = true;
+		else convert = false;
 
 		tvAltitudeUnit.setText(altitudeUnit);
 	}

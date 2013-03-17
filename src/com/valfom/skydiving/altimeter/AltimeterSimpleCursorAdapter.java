@@ -92,9 +92,9 @@ public class AltimeterSimpleCursorAdapter extends SimpleCursorAdapter {
 	@Override
 	public boolean isEnabled(int position) {
 		
-		if (getItemViewType(position) == 1) return true;
+		if (getItemViewType(position) == 2) return false;
 		
-		return false;
+		return true;
 	}
 	
 }

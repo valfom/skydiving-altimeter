@@ -6,6 +6,6 @@
         android:showAsAction="never"
         android:title="@string/action_settings"/>
     <item android:id="@+id/action_list" android:title="@string/action_list" android:showAsAction="ifRoom" android:orderInCategory="2"></item>
-    <item android:id="@+id/action_calibrate" android:orderInCategory="1" android:showAsAction="never" android:title="@string/action_calibrate"></item>
+    <item android:id="@+id/action_calibrate" android:orderInCategory="1" android:showAsAction="ifRoom" android:title="@string/action_calibrate"></item>
 
 </menu>

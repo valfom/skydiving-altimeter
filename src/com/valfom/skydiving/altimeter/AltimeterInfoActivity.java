@@ -22,7 +22,10 @@ public class AltimeterInfoActivity extends Activity {
 	private WebView wvGraphs;
 	private long id;
 	
+	private Timer tSetData;
+	
 	private boolean convert = false;
+	private boolean live = false;
 	
 	@SuppressLint("SetJavaScriptEnabled") 
 	@Override
@@ -55,7 +58,7 @@ public class AltimeterInfoActivity extends Activity {
 	        wvGraphs.getSettings().setJavaScriptEnabled(true);
 	        wvGraphs.loadUrl("file:///android_asset/graphs/graphs.html");
 	        
-	        Timer tSetData = new Timer();
+	        tSetData = new Timer();
 	    	
 			SharedPreferences sharedPreferences = getSharedPreferences(AltimeterActivity.PREF_FILE_NAME, Activity.MODE_PRIVATE);
 			
@@ -65,10 +68,8 @@ public class AltimeterInfoActivity extends Activity {
 				
 				tSetData.schedule(new setGraphsDataTask(), 0, 1000);
 				
-			} else { 
+				live = true;
 				
-				wvGraphs.loadUrl("javascript:addControlls()");
-				tSetData.schedule(new setGraphsDataTask(), 1000);
 			}
 	        
 		} else onBackPressed();
@@ -87,11 +88,22 @@ public class AltimeterInfoActivity extends Activity {
 
 		if (altitudeUnit.equals(getString(R.string.ft))) convert = true;
 		else convert = false;
+		
+		if (!live) tSetData.schedule(new setGraphsDataTask(true), 0);
 	}
 
 	class setGraphsDataTask extends TimerTask {
 
-        @Override
+		private boolean showControlls = false;
+		
+		public setGraphsDataTask() {}
+		
+        public setGraphsDataTask(boolean showControlls) {
+
+        	this.showControlls = showControlls;
+		}
+
+		@Override
         public void run() {
         	
             runOnUiThread(new Runnable() {
@@ -133,6 +145,8 @@ public class AltimeterInfoActivity extends Activity {
         	            }
         	        	
         	        	wvGraphs.loadUrl("javascript:setGraphsData(" + altitudeData.toString() + ", " + verticalSpeedData.toString() + ")");
+        	        	
+        	        	if (showControlls) wvGraphs.loadUrl("javascript:addControlls()");
         	        }
                 }
             });

@@ -1,10 +1,12 @@
 package com.valfom.skydiving.altimeter;
 
+import android.app.Activity;
 import android.app.ListActivity;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
 import android.content.Intent;
 import android.content.Loader;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -42,28 +44,42 @@ public class AltimeterListActivity extends ListActivity implements
 		getListView().setMultiChoiceModeListener(new MultiChoiceModeListener() {
 
 		    public void onItemCheckedStateChanged(ActionMode mode, 
-		    		int position, long id, boolean checked) {}
-	
+		    		int position, long id, boolean checked) {
+				
+		    	if (checked) {
+		    	
+			    	SharedPreferences sharedPreferences = getSharedPreferences(AltimeterActivity.PREF_FILE_NAME, Activity.MODE_PRIVATE);
+					boolean logging = sharedPreferences.getBoolean("logging", false);
+					
+					if (logging) {
+						
+						int trackId = sharedPreferences.getInt("trackId", 0);
+						
+						if (id == trackId) getListView().setItemChecked(position, false);
+					}
+		    	}
+		    }
+		    
 		    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
 	
 		    	switch (item.getItemId()) {
 		    	
-		        case R.id.menu_row_delete:
-		        	
-	                long[] checkedItems = getListView().getCheckedItemIds();
-	                
-	                for (long id : checkedItems) {
-	                
-	                	Uri uri = Uri.parse(AltimeterContentProvider.CONTENT_URI_TRACKS + "/" + id);
-	                    getContentResolver().delete(uri, null, null);
-	                }
-
-	                mode.finish();
-		        	
-		            return true;
-		            
-		        default:
-		            return false;
+			        case R.id.menu_row_delete:
+			        	
+		                long[] checkedItems = getListView().getCheckedItemIds();
+		                
+		                for (long id : checkedItems) {
+		                
+		                	Uri uri = Uri.parse(AltimeterContentProvider.CONTENT_URI_TRACKS + "/" + id);
+		                    getContentResolver().delete(uri, null, null);
+		                }
+	
+		                mode.finish();
+			        	
+			            return true;
+			            
+			        default:
+			            return false;
 		        }
 		    }
 	
@@ -83,7 +99,7 @@ public class AltimeterListActivity extends ListActivity implements
 		    }
 		});
 	}
-
+	
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
