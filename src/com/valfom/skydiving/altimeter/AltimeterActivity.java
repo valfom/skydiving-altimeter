@@ -195,6 +195,8 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
             			diffAltitude = Math.abs(secondAltitude - firstAltitude);
             			verticalSpeed = diffAltitude;
             			
+            			firstAltitude = secondAltitude;
+            			
             		} else firstAltitude = customAltitude;
             		
             		DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.MEDIUM);
