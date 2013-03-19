@@ -20,9 +20,9 @@ import android.webkit.WebView;
 public class AltimeterInfoActivity extends Activity {
 
 	private WebView wvGraphs;
-	private long id;
-	
 	private Timer tSetData;
+	
+	private long id;
 	
 	private boolean convert = false;
 	private boolean live = false;
