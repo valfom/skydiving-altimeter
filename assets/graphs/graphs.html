@@ -72,8 +72,8 @@
 					xaxes: [ {
 						min: 0,
 						tickDecimals: 0,
-						panRange: [ 0, altitudeData.length - 1 ],
-						zoomRange: [ 0, altitudeData.length - 1 ]
+						panRange: [ 1, altitudeData.length - 1 ],
+						zoomRange: [ 1, altitudeData.length - 1 ]
 					} ],
 					yaxes: [ {
 						min: 0,
@@ -106,6 +106,7 @@
 			
 			function addControlls() {
 			
+				$("#controls").empty();
 				addPanControls("<", { left: -100 });
 				addPanControls(">", { left: 100 });
 				addZoomControls();
