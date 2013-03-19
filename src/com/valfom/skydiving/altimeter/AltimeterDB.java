@@ -73,15 +73,4 @@ public class AltimeterDB extends SQLiteOpenHelper {
         
         return cursor;
     }
- 
-    public Cursor getAllTracks() {
-    	
-        SQLiteDatabase db = this.getReadableDatabase();
-        
-        String[] columns = new String[] { KEY_TRACKS_ID, KEY_TRACKS_DATE, KEY_TRACKS_TIME, KEY_TRACKS_TYPE };
-        
-        Cursor cursor = db.query(TABLE_TRACKS, columns, null, null, null, null, null);
-        
-        return cursor;
-    }
 }

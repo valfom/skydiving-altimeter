@@ -29,7 +29,7 @@ public class AltimeterSimpleCursorAdapter extends SimpleCursorAdapter {
 		
 		if (logging) trackId = sharedPreferences.getInt("trackId", 0);
 	}
-	
+
 	@Override
 	public int getItemViewType(int position) {
 		
@@ -44,46 +44,43 @@ public class AltimeterSimpleCursorAdapter extends SimpleCursorAdapter {
 	}
 
 	public View getView(int position, View convertView, ViewGroup parent) {
-    	
-		if (convertView == null) {
 		
-			int type;
-			Cursor cursor;
+		int type;
+		Cursor cursor;
+		
+		cursor = getCursor();
+		cursor.moveToPosition(position);
+		
+		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		
+		type = getItemViewType(position); 
+		
+		if (type == 1) {
+		
+			convertView = inflater.inflate(R.layout.list_row, null, true);
 			
-			cursor = getCursor();
-			cursor.moveToPosition(position);
+			TextView tvTime = (TextView) convertView.findViewById(R.id.tvTime);
+			String time = cursor.getString(cursor.getColumnIndex(AltimeterDB.KEY_TRACKS_TIME));
+			tvTime.setText(time);
 			
-			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			
-			type = getItemViewType(position); 
-			
-			if (type == 1) {
-			
-				convertView = inflater.inflate(R.layout.list_row, null, true);
-				
-				TextView tvTime = (TextView) convertView.findViewById(R.id.tvTime);
-				String time = cursor.getString(cursor.getColumnIndex(AltimeterDB.KEY_TRACKS_TIME));
-				tvTime.setText(time);
-				
-				if (logging) {
-					 
-					if (getItemId(position) == trackId) {
-						
-						TextView tvLive = (TextView) convertView.findViewById(R.id.tvLive);
-						tvLive.setVisibility(View.VISIBLE);
-					}
+			if (logging) {
+				 
+				if (getItemId(position) == trackId) {
+					
+					TextView tvLive = (TextView) convertView.findViewById(R.id.tvLive);
+					tvLive.setVisibility(View.VISIBLE);
 				}
-				
-			} else if (type == 2) {
-				
-				convertView = inflater.inflate(R.layout.list_row_section, null, true);
-				
-				TextView tvDate = (TextView) convertView.findViewById(R.id.tvDate);
-				
-				String date = cursor.getString(cursor.getColumnIndex(AltimeterDB.KEY_TRACKS_DATE));
-				
-				tvDate.setText(date);
 			}
+			
+		} else if (type == 2) {
+			
+			convertView = inflater.inflate(R.layout.list_row_section, null, true);
+			
+			TextView tvDate = (TextView) convertView.findViewById(R.id.tvDate);
+			
+			String date = cursor.getString(cursor.getColumnIndex(AltimeterDB.KEY_TRACKS_DATE));
+			
+			tvDate.setText(date);
 		}
 	    
         return convertView;

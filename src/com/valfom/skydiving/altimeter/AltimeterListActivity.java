@@ -102,7 +102,7 @@ public class AltimeterListActivity extends ListActivity implements
 	
 	@Override
 	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-
+		
 		return new CursorLoader(this, AltimeterContentProvider.CONTENT_URI_TRACKS,
                 null, null, null, null);
 	}

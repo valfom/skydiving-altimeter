@@ -155,7 +155,8 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 			// as an absolute value (in microseconds).
 
 			sensorManager.registerListener(this, sensorPressure, SensorManager.SENSOR_DELAY_FASTEST);
-		}
+		
+		} else finish();
 	}
 	
 	private void restoreSharedPreferences() {

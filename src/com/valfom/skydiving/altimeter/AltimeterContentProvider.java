@@ -58,7 +58,9 @@ public class AltimeterContentProvider extends ContentProvider {
 		switch (uriMatcher.match(uri)) {
 			
 			case URI_TRACKS:
-				cursor = db.getAllTracks();
+		
+				String[] cols = new String[] { AltimeterDB.KEY_TRACKS_ID, AltimeterDB.KEY_TRACKS_DATE, AltimeterDB.KEY_TRACKS_TIME, AltimeterDB.KEY_TRACKS_TYPE };
+				cursor = sqlDB.query(AltimeterDB.TABLE_TRACKS, cols, null, null, null, null, null);
 				break;
 			case URI_TRACK_ID:
 				id = uri.getLastPathSegment();

@@ -69,9 +69,8 @@ public class AltimeterInfoActivity extends Activity {
 				tSetData.schedule(new setGraphsDataTask(), 0, 1000);
 				
 				live = true;
-				
 			}
-	        
+			
 		} else onBackPressed();
 	}
 	
@@ -89,7 +88,19 @@ public class AltimeterInfoActivity extends Activity {
 		if (altitudeUnit.equals(getString(R.string.ft))) convert = true;
 		else convert = false;
 		
-		if (!live) tSetData.schedule(new setGraphsDataTask(true), 0);
+		if (!live) tSetData.schedule(new setGraphsDataTask(true), 500);
+	}
+
+	@Override
+	protected void onDestroy() {
+
+		super.onDestroy();
+		
+		if (tSetData != null) {
+
+			tSetData.cancel();
+			tSetData = null;
+    	}
 	}
 
 	class setGraphsDataTask extends TimerTask {
