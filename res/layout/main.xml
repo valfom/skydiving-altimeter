@@ -44,4 +44,21 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="30dp" />
 
+    <TextView
+        android:id="@+id/tvClimbNotifications"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/tbLog"
+        android:layout_alignParentLeft="true"
+        android:text="" />
+    
+    <TextView
+        android:id="@+id/tvFallNotifications"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/tvClimbNotifications"
+        android:layout_below="@+id/tvClimbNotifications"
+        android:layout_marginTop="30dp"
+        android:text="" />
+
 </RelativeLayout>

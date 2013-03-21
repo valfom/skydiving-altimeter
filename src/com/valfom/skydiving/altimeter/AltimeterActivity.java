@@ -43,6 +43,8 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 
 	private TextView tvAltitude;
 	private TextView tvAltitudeUnit;
+	private TextView tvFallNotifications;
+	private TextView tvClimbNotifications;
 
 	private boolean convert = false;
 
@@ -77,6 +79,8 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 			
 			tvAltitude = (TextView) findViewById(R.id.tvAltitude);
 			tvAltitudeUnit = (TextView) findViewById(R.id.tvAltitudeUnit);
+			tvFallNotifications = (TextView) findViewById(R.id.tvFallNotifications);
+			tvClimbNotifications = (TextView) findViewById(R.id.tvClimbNotifications);
 
 			ToggleButton tbShowData = (ToggleButton) findViewById(R.id.tbLog);
 
@@ -239,6 +243,7 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 		super.onResume();
 
 		String altitudeUnit;
+		String fallNotifications, climbNotifications;
 		SharedPreferences sharedPreferences;
 
 		sharedPreferences = getSharedPreferences(PREF_FILE_NAME,
@@ -251,8 +256,13 @@ public class AltimeterActivity extends Activity implements SensorEventListener, 
 
 		if (altitudeUnit.equals(getString(R.string.ft))) convert = true;
 		else convert = false;
+		
+		fallNotifications = settings.getFallNotifications();
+		climbNotifications = settings.getClimbNotifications();
 
 		tvAltitudeUnit.setText(altitudeUnit);
+		tvFallNotifications.setText(fallNotifications);
+		tvClimbNotifications.setText(climbNotifications);
 	}
 
 	@Override

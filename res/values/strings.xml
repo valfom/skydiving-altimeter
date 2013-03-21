@@ -19,7 +19,8 @@
     
     <string name="settings_personal">Personal</string>
     <string name="settings_notifications">Notifications</string>
-    <string name="settings_altitude">Altitude</string>
+    <string name="settings_fall">Fall</string>
+    <string name="settings_climb">Climb</string>
     
     <string name="settings_vibration">Vibration</string>
     <string name="settings_sound">Sound</string>
@@ -36,9 +37,11 @@
     <string name="m">m</string>
     <string name="ft">ft</string>
     
-    <string name="first_altitude">2000</string>
-    <string name="second_altitude">1300</string>
-    <string name="third_altitude">800</string>
+    <string name="first_altitude_fall">2000</string>
+    <string name="second_altitude_fall">1300</string>
+    <string name="third_altitude_fall">800</string>
+    <string name="first_altitude_climb">300</string>
+    <string name="second_altitude_climb">3500</string>
     
     <string name="btn_left">&lt;</string>
     <string name="btn_right">&gt;</string>

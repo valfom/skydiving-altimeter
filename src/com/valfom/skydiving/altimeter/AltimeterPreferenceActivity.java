@@ -17,15 +17,19 @@ public class AltimeterPreferenceActivity extends PreferenceActivity implements O
 	public static final String KEY_MEASUREMENT_UNITS = "lUnits";
 	public static final String KEY_SOUND = "rSound";
 //	public static final String KEY_VIBRATION = "cbVibration";
-	public static final String KEY_FIRST_ALTITUDE = "etFirstAltitude";
-	public static final String KEY_SECOND_ALTITUDE = "etSecondAltitude";
-	public static final String KEY_THIRD_ALTITUDE = "etThirdAltitude";
+	public static final String KEY_FIRST_ALTITUDE_FALL = "etFirstAltitudeFall";
+	public static final String KEY_SECOND_ALTITUDE_FALL = "etSecondAltitudeFall";
+	public static final String KEY_THIRD_ALTITUDE_FALL = "etThirdAltitudeFall";
+	public static final String KEY_FIRST_ALTITUDE_CLIMB = "etFirstAltitudeClimb";
+	public static final String KEY_SECOND_ALTITUDE_CLIMB = "etSecondAltitudeClimb";
 	
 	private ListPreference lMeasurementUnits;
-	private EditTextPreference etFirstAltitude;
-	private EditTextPreference etSecondAltitude;
-	private EditTextPreference etThirdAltitude;
+	private EditTextPreference etFirstAltitudeFall;
+	private EditTextPreference etSecondAltitudeFall;
+	private EditTextPreference etThirdAltitudeFall;
 	private RingtonePreference rSound;
+	private EditTextPreference etFirstAltitudeClimb;
+	private EditTextPreference etSecondAltitudeClimb;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,10 +39,12 @@ public class AltimeterPreferenceActivity extends PreferenceActivity implements O
 		addPreferencesFromResource(R.xml.preferences);
 		
 		lMeasurementUnits = (ListPreference) getPreferenceScreen().findPreference(KEY_MEASUREMENT_UNITS);
-		etFirstAltitude = (EditTextPreference) getPreferenceScreen().findPreference(KEY_FIRST_ALTITUDE);
-		etSecondAltitude = (EditTextPreference) getPreferenceScreen().findPreference(KEY_SECOND_ALTITUDE);
-		etThirdAltitude = (EditTextPreference) getPreferenceScreen().findPreference(KEY_THIRD_ALTITUDE);
+		etFirstAltitudeFall = (EditTextPreference) getPreferenceScreen().findPreference(KEY_FIRST_ALTITUDE_FALL);
+		etSecondAltitudeFall = (EditTextPreference) getPreferenceScreen().findPreference(KEY_SECOND_ALTITUDE_FALL);
+		etThirdAltitudeFall = (EditTextPreference) getPreferenceScreen().findPreference(KEY_THIRD_ALTITUDE_FALL);
 		rSound = (RingtonePreference) getPreferenceScreen().findPreference(KEY_SOUND);
+		etFirstAltitudeClimb = (EditTextPreference) getPreferenceScreen().findPreference(KEY_FIRST_ALTITUDE_CLIMB);
+		etSecondAltitudeClimb = (EditTextPreference) getPreferenceScreen().findPreference(KEY_SECOND_ALTITUDE_CLIMB);
 	}
 	
 	@Override
@@ -72,29 +78,40 @@ public class AltimeterPreferenceActivity extends PreferenceActivity implements O
         lMeasurementUnits.setSummary(sharedPreferences.getString(KEY_MEASUREMENT_UNITS, 
         		getString(R.string.settings_measurement_units)));
         
-        String altitude = sharedPreferences.getString(KEY_FIRST_ALTITUDE, getString(R.string.first_altitude));
-		
-		summary = altitude + " " + settings.getAltitudeUnit();
+        String altitude = sharedPreferences.getString(KEY_FIRST_ALTITUDE_FALL, getString(R.string.first_altitude_fall));
+        summary = altitude.equals("")? "" : altitude + " " + settings.getAltitudeUnit();
         
-        etFirstAltitude.setSummary(summary);
-        etFirstAltitude.setPositiveButtonText(getString(R.string.save));
-        etFirstAltitude.setNegativeButtonText(getString(R.string.cancel));
+        etFirstAltitudeFall.setSummary(summary);
+        etFirstAltitudeFall.setPositiveButtonText(getString(R.string.save));
+        etFirstAltitudeFall.setNegativeButtonText(getString(R.string.cancel));
         
-        altitude = sharedPreferences.getString(KEY_SECOND_ALTITUDE, getString(R.string.second_altitude));
-		
-		summary = altitude + " " + settings.getAltitudeUnit();
+        altitude = sharedPreferences.getString(KEY_SECOND_ALTITUDE_FALL, getString(R.string.second_altitude_fall));
+        summary = altitude.equals("")? "" : altitude + " " + settings.getAltitudeUnit();
+
+        etSecondAltitudeFall.setSummary(summary);
+        etSecondAltitudeFall.setPositiveButtonText(getString(R.string.save));
+        etSecondAltitudeFall.setNegativeButtonText(getString(R.string.cancel));
         
-        etSecondAltitude.setSummary(summary);
-        etSecondAltitude.setPositiveButtonText(getString(R.string.save));
-        etSecondAltitude.setNegativeButtonText(getString(R.string.cancel));
+        altitude = sharedPreferences.getString(KEY_THIRD_ALTITUDE_FALL, getString(R.string.third_altitude_fall));
+        summary = altitude.equals("")? "" : altitude + " " + settings.getAltitudeUnit();
         
-        altitude = sharedPreferences.getString(KEY_THIRD_ALTITUDE, getString(R.string.third_altitude));
-		
-		summary = altitude + " " + settings.getAltitudeUnit();
+        etThirdAltitudeFall.setSummary(summary);
+        etThirdAltitudeFall.setPositiveButtonText(getString(R.string.save));
+        etThirdAltitudeFall.setNegativeButtonText(getString(R.string.cancel));
         
-        etThirdAltitude.setSummary(summary);
-        etThirdAltitude.setPositiveButtonText(getString(R.string.save));
-        etThirdAltitude.setNegativeButtonText(getString(R.string.cancel));
+        altitude = sharedPreferences.getString(KEY_FIRST_ALTITUDE_CLIMB, getString(R.string.first_altitude_climb));
+        summary = altitude.equals("")? "" : altitude + " " + settings.getAltitudeUnit();
+        
+        etFirstAltitudeClimb.setSummary(summary);
+        etFirstAltitudeClimb.setPositiveButtonText(getString(R.string.save));
+        etFirstAltitudeClimb.setNegativeButtonText(getString(R.string.cancel));
+        
+        altitude = sharedPreferences.getString(KEY_SECOND_ALTITUDE_CLIMB, getString(R.string.second_altitude_climb));
+        summary = altitude.equals("")? "" : altitude + " " + settings.getAltitudeUnit();
+
+        etSecondAltitudeClimb.setSummary(summary);
+        etSecondAltitudeClimb.setPositiveButtonText(getString(R.string.save));
+        etSecondAltitudeClimb.setNegativeButtonText(getString(R.string.cancel));
 	}
 
 	public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
@@ -106,47 +123,66 @@ public class AltimeterPreferenceActivity extends PreferenceActivity implements O
     		lMeasurementUnits.setSummary(sharedPreferences.getString(KEY_MEASUREMENT_UNITS, 
             		getString(R.string.settings_measurement_units)));
     		
-    		String altitude = sharedPreferences.getString(KEY_FIRST_ALTITUDE, getString(R.string.first_altitude));
-    		
-    		String summary = altitude + " " + settings.getAltitudeUnit();
+    		String altitude = sharedPreferences.getString(KEY_FIRST_ALTITUDE_FALL, getString(R.string.first_altitude_fall));
+    		String summary = altitude.equals("")? "" : altitude + " " + settings.getAltitudeUnit();
             
-			etFirstAltitude.setSummary(summary);
+			etFirstAltitudeFall.setSummary(summary);
 			
-			altitude = sharedPreferences.getString(KEY_SECOND_ALTITUDE, getString(R.string.second_altitude));
-			
-			summary = altitude + " " + settings.getAltitudeUnit();
+			altitude = sharedPreferences.getString(KEY_SECOND_ALTITUDE_FALL, getString(R.string.second_altitude_fall));
+			summary = altitude.equals("")? "" : altitude + " " + settings.getAltitudeUnit();
 	        
-			etSecondAltitude.setSummary(summary);
+			etSecondAltitudeFall.setSummary(summary);
 			
-			altitude = sharedPreferences.getString(KEY_THIRD_ALTITUDE, getString(R.string.third_altitude));
-			
-			summary = altitude + " " + settings.getAltitudeUnit();
+			altitude = sharedPreferences.getString(KEY_THIRD_ALTITUDE_FALL, getString(R.string.third_altitude_fall));
+			summary = altitude.equals("")? "" : altitude + " " + settings.getAltitudeUnit();
 	        
-			etThirdAltitude.setSummary(summary);
-    		
-    	} else if (key.equals(KEY_FIRST_ALTITUDE)) {
-    	
-    		String altitude = sharedPreferences.getString(KEY_FIRST_ALTITUDE, getString(R.string.first_altitude));
-    		
-    		String summary = altitude + " " + settings.getAltitudeUnit();
+			etThirdAltitudeFall.setSummary(summary);
+			
+			altitude = sharedPreferences.getString(KEY_FIRST_ALTITUDE_CLIMB, getString(R.string.first_altitude_climb));
+    		summary = altitude.equals("")? "" : altitude + " " + settings.getAltitudeUnit();
             
-    		etFirstAltitude.setSummary(summary);
+			etFirstAltitudeClimb.setSummary(summary);
+			
+			altitude = sharedPreferences.getString(KEY_SECOND_ALTITUDE_CLIMB, getString(R.string.second_altitude_climb));
+			summary = altitude.equals("")? "" : altitude + " " + settings.getAltitudeUnit();
+	        
+			etSecondAltitudeFall.setSummary(summary);
     		
-    	} else if (key.equals(KEY_SECOND_ALTITUDE)) {
+    	} else if (key.equals(KEY_FIRST_ALTITUDE_FALL)) {
     	
-    		String altitude = sharedPreferences.getString(KEY_SECOND_ALTITUDE, getString(R.string.second_altitude));
-    		
-    		String summary = altitude + " " + settings.getAltitudeUnit();
+    		String altitude = sharedPreferences.getString(KEY_FIRST_ALTITUDE_FALL, getString(R.string.first_altitude_fall));
+    		String summary = altitude.equals("")? "" : altitude + " " + settings.getAltitudeUnit();
             
-    		etSecondAltitude.setSummary(summary);
+    		etFirstAltitudeFall.setSummary(summary);
     		
-    	} else if (key.equals(KEY_THIRD_ALTITUDE)) {
+    	} else if (key.equals(KEY_SECOND_ALTITUDE_FALL)) {
     	
-    		String altitude = sharedPreferences.getString(KEY_THIRD_ALTITUDE, getString(R.string.third_altitude));
+    		String altitude = sharedPreferences.getString(KEY_SECOND_ALTITUDE_FALL, getString(R.string.second_altitude_fall));
+			String summary = altitude.equals("")? "" : altitude + " " + settings.getAltitudeUnit();
+        
+			etSecondAltitudeFall.setSummary(summary);
     		
-    		String summary = altitude + " " + settings.getAltitudeUnit();
+    	} else if (key.equals(KEY_THIRD_ALTITUDE_FALL)) {
+    	
+    		String altitude = sharedPreferences.getString(KEY_THIRD_ALTITUDE_FALL, getString(R.string.third_altitude_fall));
+			String summary = altitude.equals("")? "" : altitude + " " + settings.getAltitudeUnit();
+        
+			etThirdAltitudeFall.setSummary(summary);
+			
+    	} else if (key.equals(KEY_FIRST_ALTITUDE_CLIMB)) {
+    	
+    		String altitude = sharedPreferences.getString(KEY_FIRST_ALTITUDE_CLIMB, getString(R.string.first_altitude_climb));
+    		String summary = altitude.equals("")? "" : altitude + " " + settings.getAltitudeUnit();
             
-    		etThirdAltitude.setSummary(summary);
+    		etFirstAltitudeClimb.setSummary(summary);
+    		
+    	} else if (key.equals(KEY_SECOND_ALTITUDE_CLIMB)) {
+    	
+    		String altitude = sharedPreferences.getString(KEY_SECOND_ALTITUDE_CLIMB, getString(R.string.second_altitude_climb));
+			String summary = altitude.equals("")? "" : altitude + " " + settings.getAltitudeUnit();
+        
+			etSecondAltitudeClimb.setSummary(summary);
+    		
     	}
 	}
 }

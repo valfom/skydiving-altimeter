@@ -20,28 +20,40 @@
         <RingtonePreference
             android:key="rSound"
             android:ringtoneType="all"
-            android:showSilent="true"
             android:showDefault="false"
+            android:showSilent="true"
             android:title="@string/settings_sound" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/settings_altitude" >
+    <PreferenceCategory android:title="@string/settings_climb" >
         <EditTextPreference
-            android:defaultValue="@string/first_altitude"
+            android:defaultValue="300"
             android:inputType="number"
-            android:key="etFirstAltitude"
-            android:summary="@string/first_altitude"
+            android:key="etFirstAltitudeClimb"
             android:title="@string/settings_first_altitude" />
         <EditTextPreference
-            android:defaultValue="@string/second_altitude"
+            android:defaultValue="3500"
+            android:dependency="etFirstAltitudeClimb"
             android:inputType="number"
-            android:key="etSecondAltitude"
-            android:summary="@string/second_altitude"
+            android:key="etSecondAltitudeClimb"
+            android:title="@string/settings_second_altitude" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/settings_fall" >
+        <EditTextPreference
+            android:defaultValue="@string/first_altitude_fall"
+            android:inputType="number"
+            android:key="etFirstAltitudeFall"
+            android:title="@string/settings_first_altitude" />
+        <EditTextPreference
+            android:defaultValue="@string/second_altitude_fall"
+            android:dependency="etFirstAltitudeFall"
+            android:inputType="number"
+            android:key="etSecondAltitudeFall"
             android:title="@string/settings_second_altitude" />
         <EditTextPreference
-            android:defaultValue="@string/third_altitude"
+            android:defaultValue="@string/third_altitude_fall"
+            android:dependency="etSecondAltitudeFall"
             android:inputType="number"
-            android:key="etThirdAltitude"
-            android:summary="@string/third_altitude"
+            android:key="etThirdAltitudeFall"
             android:title="@string/settings_third_altitude" />
     </PreferenceCategory>
 
